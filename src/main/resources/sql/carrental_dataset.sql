@@ -1,7 +1,6 @@
 USE carrental;
 
 -- USERS
--- ============================================================
 INSERT INTO users (username, email, password, userType) VALUES
          ('admin1',   'admin1@email.com',   'pass_admin1', 2),
          ('staff1',   'staff1@email.com',   'pass_staff1', 3),
