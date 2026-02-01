@@ -6,11 +6,12 @@ package SpringProject.utils;
  * @Date:   January 2026                  *
  ******************************************/
 
-import com.example.ca3webpatterns2026.persistence.Connector;
-import com.example.ca3webpatterns2026.persistence.MySqlConnector;
-import com.example.ca3webpatterns2026.persistence.UserDao;
-import com.example.ca3webpatterns2026.persistence.UserDaoImpl;
+import SpringProject.persistences.Connector;
+import SpringProject.persistences.MySqlConnector;
+import SpringProject.persistences.UserDao;
+import SpringProject.persistences.UserDaoImpl;
 import org.mindrot.jbcrypt.BCrypt;
+
 
 import java.sql.SQLException;
 import java.util.ArrayList;
