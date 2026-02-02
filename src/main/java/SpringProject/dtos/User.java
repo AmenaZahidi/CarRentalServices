@@ -8,7 +8,7 @@ package SpringProject.dtos;
 
 import lombok.*;
 
-import java.time.LocalDate;
+//import java.time.LocalDate;
 import java.util.Objects;
 
 @Getter
@@ -39,7 +39,8 @@ public class User implements Comparable<User>{
     private  String password;
     @NonNull
     private  String email;
-    @NonNull
+    //@NonNull
+   // @NonBlank
     private int userType;
 
     /**

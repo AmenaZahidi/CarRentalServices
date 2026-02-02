@@ -7,13 +7,23 @@ USE carrental;
 -- USERS
 -- userType: 1 = customer, 2 = admin, 3 = staff
 -- ============================================================
+-- CREATE TABLE users
+-- (
+--    username  VARCHAR(50)         NOT NULL,
+--    email     VARCHAR(255) UNIQUE NOT NULL,
+--    password  VARCHAR(255)        NOT NULL,
+--    userType  INT(1) NOT NULL DEFAULT 1 COMMENT '1 customer, 2 admin, 3 staff',
+--    PRIMARY KEY (username)
+-- );
 CREATE TABLE users
 (
-    username  VARCHAR(50)         NOT NULL,
-    email     VARCHAR(255) UNIQUE NOT NULL,
-    password  VARCHAR(255)        NOT NULL,
+    userID    INT AUTO_INCREMENT,
+    username  VARCHAR(50)          NOT NULL,
+    email     VARCHAR(255) UNIQUE  NOT NULL,
+    password  VARCHAR(255)         NOT NULL,
     userType  INT(1) NOT NULL DEFAULT 1 COMMENT '1 customer, 2 admin, 3 staff',
-    PRIMARY KEY (username)
+    PRIMARY KEY (userID),
+    UNIQUE (username)
 );
 
 -- ============================================================
