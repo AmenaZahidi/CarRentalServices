@@ -42,7 +42,7 @@ email VARCHAR(255) UNIQUE NOT NULL,
 phoneNumber VARCHAR(15),
 address TEXT,
 licenseNumber VARCHAR(20) UNIQUE NOT NULL,
-dateOfBirth DATE NOT NULL
+dateOfBirth DATE NOT NULL,
 permitType ENUM('manual', 'automatic')
 );
 
