@@ -8,19 +8,19 @@ CREATE TABLE users (
     username  VARCHAR(50)          NOT NULL,
     email     VARCHAR(255) UNIQUE  NOT NULL,
     password  VARCHAR(255)         NOT NULL,
-    DateOfBirth DATE NOT NULL,
+    dateOfBirth DATE NOT NULL,
     userType  INT(1) NOT NULL DEFAULT 1 COMMENT '1 customer, 2 admin, 3 staff',
     PRIMARY KEY (userID),
     UNIQUE (username)
 );
---LOCATION TABLE
+-- LOCATION TABLE
 CREATE TABLE location (
 locationId	INT AUTO_INCREMENT PRIMARY KEY,
 branchName	VARCHAR(100) NOT NULL,
 address		VARCHAR(255),
 phoneNumber VARCHAR(15)
 );
---CAR DETAILS TABLE
+-- CAR DETAILS TABLE
 CREATE TABLE carDetails (
 carId INT AUTO_INCREMENT PRIMARY KEY,
 regNumber VARCHAR(15) UNIQUE NOT NULL,
@@ -33,7 +33,7 @@ transmission ENUM('manual', 'automatic'),
 currentStatus ENUM('available', 'rented', 'maintenance') DEFAULT 'available',
 fuelType ENUM('petrol', 'diesel', 'electric', 'hybrid')
 );
---DRIVER DETAILS TABLE
+-- DRIVER DETAILS TABLE
 CREATE TABLE driverdetails (
 driverId INT AUTO_INCREMENT PRIMARY KEY,
 firstName VARCHAR(50) NOT NULL,
@@ -46,7 +46,7 @@ dateOfBirth DATE NOT NULL,
 permitType ENUM('manual', 'automatic')
 );
 
---BOOKINGS TABLE
+-- BOOKINGS TABLE
 CREATE TABLE bookings (
 bookingId INT AUTO_INCREMENT PRIMARY KEY,
 driverId INT NOT NULL,
@@ -65,7 +65,7 @@ FOREIGN KEY (pickupLocationId) REFERENCES location(locationId)
 );
 
 
---PAYMENT TABLE
+-- PAYMENT TABLE
 CREATE TABLE payment (
 paymentId INT AUTO_INCREMENT PRIMARY KEY,
 bookingId INT NOT NULL,

@@ -1,6 +1,6 @@
 USE tDatabase;
 --USERS
-INSERT INTO users (username, email, password, DateOfBirth, userType) VALUES
+INSERT INTO users (username, email, password, dateOfBirth, userType) VALUES
 ('john_doe', 'john@example.com', 'hashedpass1', '1990-05-12', 1),
 ('admin_user', 'admin@example.com', 'hashedpass2', '1985-03-20', 2),
 ('staff_mary', 'mary.staff@example.com', 'hashedpass3', '1992-11-02', 3);
