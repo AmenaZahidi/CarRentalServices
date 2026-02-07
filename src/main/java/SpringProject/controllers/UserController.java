@@ -3,11 +3,16 @@ package SpringProject.controllers;
 import SpringProject.dtos.User;
 import SpringProject.services.UserService;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Date;
+
+@Slf4j
 @Controller
 public class UserController {
 
@@ -28,9 +33,10 @@ public class UserController {
     public String register(@RequestParam String username,
                            @RequestParam String email,
                            @RequestParam String password,
+                           @RequestParam Date dateOfBirth,
                            HttpSession session) {
         try {
-            boolean ok = userService.register(username, password, email);
+            boolean ok = userService.register(username, password, email, dateOfBirth);
 
             if (ok) {
                 // store session like CA3

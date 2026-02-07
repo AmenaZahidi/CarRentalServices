@@ -43,7 +43,7 @@ public class UserDaoImpl implements UserDao{
      *         or if the insert operation fails
      */
     @Override
-    public boolean register(String username, String password, String email) throws SQLException {
+    public boolean register(String username, String password, String email, java.util.Date dateOfBirth) throws SQLException {
 
         // Validate username
         if (username == null) {
@@ -59,6 +59,11 @@ public class UserDaoImpl implements UserDao{
         if (email == null || email.isBlank()) {
             throw new IllegalArgumentException("Cannot register with a null or blank email!");
         }
+        // Validate email
+        if (dateOfBirth == null ) {
+            throw new IllegalArgumentException("Cannot register with a null or blank dateOfBirth!");
+        }
+
 
         // Obtain a database connection
         Connection connection = connector.getConnection();
@@ -73,13 +78,14 @@ public class UserDaoImpl implements UserDao{
 
         // Use try-with-resources to ensure the PreparedStatement is closed properly
         try (PreparedStatement ps = connection.prepareStatement(
-                "INSERT INTO users (username, password, email, userType) VALUES (?,?,?,?)")) {
+                "INSERT INTO users (username, password, email, dateOfBirth, userType) VALUES (?,?,?,?,?)")) {
 
             // Bind values to the SQL query parameters
             ps.setString(1, username);
             ps.setString(2, hashedPassword);
             ps.setString(3, email);
-            ps.setInt(4, 1); // Default userType is 1 (standard user)
+            ps.setDate(4, (Date) dateOfBirth);
+            ps.setInt(5, 1); // Default userType is 1 (standard user)
 
             // Execute insert and capture affected row count
             addedRows = ps.executeUpdate();
@@ -100,6 +106,7 @@ public class UserDaoImpl implements UserDao{
         // Registration is successful only if exactly one row was inserted
         return addedRows == 1;
     }
+
 
 
     /**
@@ -404,6 +411,7 @@ public class UserDaoImpl implements UserDao{
                 .username(rs.getString("username"))
                 .password(rs.getString("password"))
                 .email(rs.getString("email"))
+                .dateOfBirth(rs.getDate("dateOfBirth"))
                 .userType(rs.getInt("userType"))
 
                 .build();
@@ -421,11 +429,14 @@ public class UserDaoImpl implements UserDao{
         System.out.print("Password: ");
         String password = input.nextLine();
 
+        System.out.print("Date Of Birth: ");
+        Date dateOfBirth = Date.valueOf(input.nextLine());
+
         System.out.print("Email: ");
         String email = input.nextLine();
 
         try {
-            boolean registered = userDao.register(username, password, email);
+            boolean registered = userDao.register(username, password, email, dateOfBirth);
             if (registered) {
                 System.out.println("Welcome to the system, " + username);
             } else {
