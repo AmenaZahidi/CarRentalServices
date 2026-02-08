@@ -11,16 +11,9 @@ import java.sql.SQLException;
 
 @Configuration
 public class ConnectorConfig {
-   private Environment env;
-
-   public ConnectorConfig(Environment env) {
-       this.env = env;
-    }
-
     @Bean
-    public Connector connector() throws SQLException {
-       String path = env.getProperty("connector.properties.path");
-       return new MySqlConnector(path);
+    public Connector connector() {
+        return new MySqlConnector("properties/database.properties");
     }
-
 }
+

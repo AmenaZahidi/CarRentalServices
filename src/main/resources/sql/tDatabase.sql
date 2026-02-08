@@ -3,24 +3,27 @@ CREATE DATABASE IF NOT EXISTS tDatabase;
 USE tDatabase;
 
 -- USERS TABLE
+DROP DATABASE IF EXISTS tDatabase;
+CREATE DATABASE tDatabase;
+USE tDatabase;
+
+DROP TABLE IF EXISTS users;
+
 CREATE TABLE users (
-    userId    INT AUTO_INCREMENT,
-    username  VARCHAR(50)          NOT NULL,
-    email     VARCHAR(255) UNIQUE  NOT NULL,
-    password  VARCHAR(255)         NOT NULL,
-    DateOfBirth DATE NOT NULL,
-    userType  INT(1) NOT NULL DEFAULT 1 COMMENT '1 customer, 2 admin, 3 staff',
-    PRIMARY KEY (userID),
-    UNIQUE (username)
+userId   INT AUTO_INCREMENT PRIMARY KEY,
+username VARCHAR(50)  NOT NULL UNIQUE,
+email    VARCHAR(255) NOT NULL UNIQUE,
+password VARCHAR(255) NOT NULL,
+userType INT NOT NULL DEFAULT 1
 );
---LOCATION TABLE
+
+
 CREATE TABLE location (
 locationId	INT AUTO_INCREMENT PRIMARY KEY,
 branchName	VARCHAR(100) NOT NULL,
 address		VARCHAR(255),
 phoneNumber VARCHAR(15)
 );
---CAR DETAILS TABLE
 CREATE TABLE carDetails (
 carId INT AUTO_INCREMENT PRIMARY KEY,
 regNumber VARCHAR(15) UNIQUE NOT NULL,
@@ -33,7 +36,6 @@ transmission ENUM('manual', 'automatic'),
 currentStatus ENUM('available', 'rented', 'maintenance') DEFAULT 'available',
 fuelType ENUM('petrol', 'diesel', 'electric', 'hybrid')
 );
---DRIVER DETAILS TABLE
 CREATE TABLE driverdetails (
 driverId INT AUTO_INCREMENT PRIMARY KEY,
 firstName VARCHAR(50) NOT NULL,
@@ -46,7 +48,6 @@ dateOfBirth DATE NOT NULL,
 permitType ENUM('manual', 'automatic')
 );
 
---BOOKINGS TABLE
 CREATE TABLE bookings (
 bookingId INT AUTO_INCREMENT PRIMARY KEY,
 driverId INT NOT NULL,
@@ -65,7 +66,6 @@ FOREIGN KEY (pickupLocationId) REFERENCES location(locationId)
 );
 
 
---PAYMENT TABLE
 CREATE TABLE payment (
 paymentId INT AUTO_INCREMENT PRIMARY KEY,
 bookingId INT NOT NULL,
