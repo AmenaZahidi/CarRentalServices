@@ -38,7 +38,7 @@ public class MySqlConnector implements Connector{
 
         String driver = properties.getProperty("driver", "com.mysql.cj.jdbc.Driver");
         String url = properties.getProperty("url", "jdbc:mysql://127.0.0.1:3306/");
-        String database = properties.getProperty("database", "carrental");
+        String database = properties.getProperty("database", "tDatabase");
         String username = properties.getProperty("username", "root");
         String password = properties.getProperty("password", "");
 

@@ -9,6 +9,7 @@ package SpringProject.dtos;
 import lombok.*;
 
 //import java.time.LocalDate;
+import java.util.Date;
 import java.util.Objects;
 
 @Getter
@@ -21,13 +22,17 @@ import java.util.Objects;
 
 
 public class User implements Comparable<User>{
-    //*CREATE TABLE users (
-    //    userId     INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    //    username   VARCHAR(50) NOT NULL UNIQUE,
-    //    password   VARCHAR(60) NOT NULL,
-    //    email      VARCHAR(100) NOT NULL UNIQUE,
-    //    userType   INT(11) DEFAULT 1
-    //);
+
+   /* CREATE TABLE users (
+    userId    INT AUTO_INCREMENT,
+    username  VARCHAR(50)          NOT NULL,
+    email     VARCHAR(255) UNIQUE  NOT NULL,
+    password  VARCHAR(255)         NOT NULL,
+    dateOfBirth DATE NOT NULL,
+    userType  INT(1) NOT NULL DEFAULT 1 COMMENT '1 customer, 2 admin, 3 staff',
+    PRIMARY KEY (userID),
+    UNIQUE (username)
+    );*/
 
     // Annotate all fields that cannot be null with NonNull
     // Don't include any auto-generating primary key fields as these may not be known when the object is created
@@ -39,9 +44,10 @@ public class User implements Comparable<User>{
     private  String password;
     @NonNull
     private  String email;
-    //@NonNull
-   // @NonBlank
-    private int userType;
+    @NonNull
+    private Date dateOfBirth;
+    @NonNull
+    private Integer userType;
 
     /**
      * Returns a formatted, human-readable representation of the user.
@@ -51,6 +57,7 @@ public class User implements Comparable<User>{
     public String format() {
         String formattedText = userId + ": " + username
                 + "\n\t" + password + ", " + email
+                + "\n\t " + dateOfBirth
                 + "\n\t " + userType;
 
 
@@ -69,8 +76,9 @@ public class User implements Comparable<User>{
         return Objects.equals(u1.username, u2.username)
                 && Objects.equals(u1.password, u2.password)
                 && Objects.equals(u1.email, u2.email)
-                && Objects.equals(u1.userType, u2.userType);
-
+                //&& Objects.equals(u1.userType, u2.userType);
+                && Objects.equals(u1.dateOfBirth, u2.dateOfBirth)
+                && u1.userType == u2.userType;
 
     }
     /**
