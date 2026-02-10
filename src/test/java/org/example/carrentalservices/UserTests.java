@@ -44,4 +44,10 @@ void testDuplicateUsername() throws SQLException {
         userDao.register("john", "Password123", "john");
         assertTrue(userDao.login("john", "Password123"));
 }
+@Test
+    void testLoginFailure() throws Exception {
+        userDao.register("john", "Password123", "john");
+        boolean result = userDao.login("john", "Password");
+        assertFalse(result);
+    }
 }
