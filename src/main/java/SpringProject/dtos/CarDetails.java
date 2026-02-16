@@ -7,16 +7,16 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class CarDetails {
-    private int carID;
+    private int carId;
     private String regNumber;
     private String make;
     private String model;
-    private int year;
+    private int carYear;
 
     private String colour;
     private Integer mileage;
-    private String fuelType;
 
-    private double dailyRate;
-    private String status;
+    private String transmission;   // manual,  automatic
+    private String currentStatus;
+    private String fuelType;
 }

@@ -4,7 +4,6 @@ import SpringProject.dtos.User;
 import SpringProject.persistences.UserDao;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -17,8 +16,8 @@ public class UserService {
     }
 
     // Register + Login
-    public boolean register(String username, String password, String email, Date dateOfBirth) throws Exception {
-        return userDao.register(username, password, email,dateOfBirth);
+    public boolean register(String username, String password, String email) throws Exception {
+        return userDao.register(username, password, email);
     }
 
 
