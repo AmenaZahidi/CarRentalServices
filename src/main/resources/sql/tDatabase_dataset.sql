@@ -1,8 +1,19 @@
+
 USE tDatabase;
-INSERT INTO users (username, email, password, DateOfBirth, userType) VALUES
-('john_doe', 'john@example.com', 'hashedpass1', '1990-05-12', 1),
-('admin_user', 'admin@example.com', 'hashedpass2', '1985-03-20', 2),
-('staff_mary', 'mary.staff@example.com', 'hashedpass3', '1992-11-02', 3);
+
+
+
+
+--ADDRESSES
+INSERT INTO addresses (addressLine1, addressLine2, city, county, postcode, country) VALUES
+('12 Main Street', 'Apt 3B', 'Dundalk', 'Louth', 'A91 XY23', 'Ireland'),
+('45 Oakwood Drive', NULL, 'Drogheda', 'Louth', 'A92 HT71', 'Ireland'),
+('7 Riverbank Close', NULL, 'Ardee', 'Louth', 'A92 P9K4', 'Ireland');
+
+INSERT INTO users (addressId, username, email, dateOfBirth, password, userType) VALUES
+(1, 'john_doe', 'john@example.com', '1990-05-12', 'hashedpass1', 1),
+(2, 'admin_user', 'admin@example.com', '1985-03-20', 'hashedpass2', 2),
+(3, 'staff_mary', 'mary.staff@example.com', '1992-11-02', 'hashedpass3', 1);
 
 -- LOCATIONS
 INSERT INTO location (branchName, address, phoneNumber) VALUES
@@ -17,9 +28,10 @@ INSERT INTO carDetails (regNumber, make, model, carYear, colour, mileage, transm
 ('181G99887', 'Nissan', 'Leaf', 2018, 'White', 52000, 'automatic', 'maintenance', 'electric');
 
 -- DRIVER DETAILS
-INSERT INTO driverdetails (firstName, lastName, email, phoneNumber, address, licenseNumber, dateOfBirth, permitType) VALUES
-('John', 'Murphy', 'john.murphy@example.com', '0851112222', '10 Green Road, Dublin', 'D1234567', '1990-01-15', 'manual'),
-('Sarah', 'OBrien', 'sarah.obrien@example.com', '0863334444', '22 Oak Street, Cork', 'C7654321', '1988-07-09', 'automatic');
+INSERT INTO driverdetails (addressId, firstName, lastName, email, phoneNumber, licenseNumber, dateOfBirth, permitType) VALUES
+(1, 'John', 'Murphy', 'john.murphy@example.com', '0851112222', 'D1234567', '1990-01-15', 'manual'),
+(2, 'Amy', 'Donoghue', 'amy.donoghue@example.com', '0899769309', 'D123421', '1999-04-16', 'automatic'),
+(3, 'Sarah', 'OBrien', 'sarah.obrien@example.com', '0863334444', 'C7654321', '1988-07-09', 'automatic');
 
 -- BOOKINGS
 INSERT INTO bookings (driverId, userId, carId, pickupDatetime, returnDatetime, pickupLocationId, totalPrice, status) VALUES
@@ -32,4 +44,7 @@ INSERT INTO payment (bookingId, amount) VALUES
 (1, 250.00),
 (2, 180.00),
 (3, 150.00);
+
+
+
 
