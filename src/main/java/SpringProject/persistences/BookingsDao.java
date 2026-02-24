@@ -16,7 +16,7 @@ totalPrice DECIMAL(10, 2),
 status ENUM('confirmed', 'active', 'returned', 'cancelled') DEFAULT 'confirmed',
  */
 public interface BookingsDao {
-    List<Bookings> findAllBookings() throws SQLException;
+    List<Bookings> getAllBookings() throws SQLException;
     Bookings getBookingsById(int bookingId) throws SQLException;
     boolean deleteBooking(int bookingId) throws SQLException;
     boolean AddBookings(Bookings bookings) throws SQLException;
