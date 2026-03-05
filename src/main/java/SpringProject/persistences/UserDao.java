@@ -8,11 +8,10 @@ package SpringProject.persistences;
 
 import SpringProject.dtos.User;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 
 public interface UserDao {
-    boolean register(String username, String password, String email, Date dateOfBirth)throws Exception;
+    boolean register(String username, String password, String email)throws Exception;
 
     //boolean register(String username, String password, String email, Date dateOfBirth) throws SQLException;
 

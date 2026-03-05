@@ -71,18 +71,19 @@ public class UserDaoImpl implements UserDao{
         int addedRows = 0;
 
         // Use try-with-resources to ensure the PreparedStatement is closed properly
-        try (PreparedStatement ps = connection.prepareStatement(
-                "INSERT INTO users (username, password_hash, email, userType) VALUES (?,?,?,?)")) {
+        // 1. Updated SQL string to include all 6 columns
+        String sql = "INSERT INTO users (addressId, username, email, dateOfBirth, password, userType) VALUES (?, ?, ?, ?, ?, ?)";
 
-            // Bind values to the SQL query parameters
-            ps.setString(1, username);
-            ps.setString(2, hashedPassword);
-            ps.setString(3, email);
-            ps.setInt(4, 1); // Default userType is 1 (standard user)
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            // Execute insert and capture affected row count
+            ps.setInt(1, 1);                                    // addressId
+            ps.setString(2, username);                          // username
+            ps.setString(3, email);                             // email
+            ps.setDate(4, java.sql.Date.valueOf("2000-01-01")); // dateOfBirth
+            ps.setString(5, hashedPassword);                    // password
+            ps.setInt(6, 1);                                    // userType
+
             addedRows = ps.executeUpdate();
-
         } catch (SQLIntegrityConstraintViolationException e) {
             // Thrown when username or email violates a UNIQUE constraint
             throw new SQLException("Username or email already exists", e);
@@ -141,7 +142,7 @@ public class UserDaoImpl implements UserDao{
                 // If a user is found, verify the supplied password
                 // against the stored hashed password
                 if (rs.next()) {
-                    String hashedPassword = rs.getString("password_hash");
+                    String hashedPassword = rs.getString("password");
                     return PasswordHasher.verifyPassword(password, hashedPassword);
                 }
 
@@ -364,7 +365,7 @@ public class UserDaoImpl implements UserDao{
     @Override
     public boolean updateUser(User user) throws SQLException {
         Connection conn=connector.getConnection();
-        String sql = "UPDATE users SET username = ?, password_hash = ?, email = ?, userType = ? WHERE userId =?";
+        String sql = "UPDATE users SET username = ?, password = ?, email = ?, userType = ? WHERE userId =?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPassword());
@@ -401,7 +402,7 @@ public class UserDaoImpl implements UserDao{
         return User.builder()
                 .userId(rs.getInt("userId"))
                 .username(rs.getString("username"))
-                .password(rs.getString("password_hash"))
+                .password(rs.getString("password"))
                 .email(rs.getString("email"))
                 .userType(rs.getInt("userType"))
 
