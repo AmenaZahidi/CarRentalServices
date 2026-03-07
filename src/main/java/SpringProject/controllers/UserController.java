@@ -50,6 +50,23 @@ public class UserController {
         model.addAttribute("userType", session.getAttribute("userType"));
         return "dashboard";
     }
+    @GetMapping("/contact")
+    public String showContactPage(HttpSession session, Model model) {
+        if (session.getAttribute("loggedInUser") == null) return "redirect:/login";
+        return "contact"; // Opens contact.html
+    }
+
+    @GetMapping("/locations")
+    public String showLocationsPage(HttpSession session, Model model) {
+        if (session.getAttribute("loggedInUser") == null) return "redirect:/login";
+        return "locations"; // Opens locations.html
+    }
+    @GetMapping("/manageBookings")
+    public String showManageBookingsPage(HttpSession session) {
+        if (session.getAttribute("loggedInUser") == null) return "redirect:/login";
+        return "manageBookings"; // This will look for manageBookings.html
+    }
+
 
     @PostMapping("/register")
     public String register(
