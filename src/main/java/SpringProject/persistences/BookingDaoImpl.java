@@ -26,7 +26,7 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
         if (conn == null) throw new SQLException("getAllBookings(): Could not establish connection to database.");
 
         String sql = """
-                SELECT bookingId, pickupDateTime, returnDateTime, status, totalPrice
+                SELECT bookingId, pickupDatetime, returnDatetime, status, totalPrice
                 FROM Bookings
                 ORDER BY bookingId
                 """;
@@ -52,7 +52,7 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
         if (conn == null) throw new SQLException("getBookingsById(): Could not establish connection to database.");
 
         String sql = """
-                SELECT bookingId, pickupDateTime, returnDateTime, status, totalPrice
+                SELECT bookingId, pickupDatetime, returnDatetime, status, totalPrice
                 FROM Bookings
                 WHERE bookingId = ?
                 """;
@@ -99,13 +99,12 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
             throw new SQLException("Could not establish connection to database");
         }
         int addedRows = 0;
-        String sql = "INSERT INTO bookings (bookingId, pickupDateTime, returnDateTime, status, totalPrice) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO bookings ( pickupDatetime, returnDatetime, status, totalPrice) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, bookings.getBookingId());
-            ps.setTimestamp(2, new java.sql.Timestamp(bookings.getPickupDateTime().getTime()));
-            ps.setTimestamp(3,new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
-            ps.setString(4, bookings.getStatus());
-            ps.setDouble(5, bookings.getTotalPrice());
+            ps.setTimestamp(1, new java.sql.Timestamp(bookings.getPickupDateTime().getTime()));
+            ps.setTimestamp(2,new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
+            ps.setString(3, bookings.getStatus());
+            ps.setDouble(4, bookings.getTotalPrice());
             addedRows = ps.executeUpdate();
         }
         catch (SQLException e){
@@ -120,15 +119,15 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("updateBookingStatus(): Could not establish connection to database.");
 
-        String sql = "UPDATE Bookings SET pickupDateTime = ?, returnDateTime= ?, totalPrice = ?, status = ? " +
+        String sql = "UPDATE Bookings SET pickupDatetime = ?, returnDatetime= ?, totalPrice = ?, status = ? " +
                 " WHERE bookingId = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setTimestamp(2, new java.sql.Timestamp(bookings.getPickupDateTime().getTime()));
-            ps.setTimestamp(3,new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
-            ps.setString(4, bookings.getStatus());
-            ps.setDouble(5, bookings.getTotalPrice());
-            ps.setInt(1, bookings.getBookingId());
+            ps.setTimestamp(1, new java.sql.Timestamp(bookings.getPickupDateTime().getTime()));
+            ps.setTimestamp(2,new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
+            ps.setString(3, bookings.getStatus());
+            ps.setDouble(4, bookings.getTotalPrice());
+            ps.setInt(5, bookings.getBookingId());
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
