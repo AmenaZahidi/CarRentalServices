@@ -77,7 +77,7 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
     @Override
     public boolean deleteBooking(int bookingId) throws SQLException {
         Connection conn = connector.getConnection();
-        String sql="DELETE FROM users WHERE bookingId =?";
+        String sql="DELETE FROM bookings WHERE bookingId =?";
         try(PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setInt(1, bookingId);
             return ps.executeUpdate()>0;
@@ -124,11 +124,11 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
                 " WHERE bookingId = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, bookings.getBookingId());
             ps.setTimestamp(2, new java.sql.Timestamp(bookings.getPickupDateTime().getTime()));
             ps.setTimestamp(3,new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
             ps.setString(4, bookings.getStatus());
             ps.setDouble(5, bookings.getTotalPrice());
+            ps.setInt(1, bookings.getBookingId());
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
@@ -143,8 +143,8 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
     private static Bookings mapBookingsRow(ResultSet rs) throws SQLException{
         return Bookings.builder()
                 .bookingId(rs.getInt("bookingId"))
-                .pickupDateTime(rs.getDate("pickupDateTime"))
-                .returnDateTime(rs.getDate("returnDateTime"))
+                .pickupDateTime(rs.getTimestamp("pickupDateTime"))
+                .returnDateTime(rs.getTimestamp("returnDateTime"))
                 .totalPrice(rs.getDouble("totalPrice"))
                 .status(rs.getString("status"))
                 .build();
