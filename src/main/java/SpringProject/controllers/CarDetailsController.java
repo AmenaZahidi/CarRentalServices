@@ -23,26 +23,31 @@ public class CarDetailsController {
     private boolean notLoggedIn(HttpSession session) {
         return session == null || session.getAttribute("loggedInUser") == null;
     }
-
-    // Displays the main Car Details HTML page
     @GetMapping
-    public String showAllCarsPage(HttpSession session, Model model) {
-        if (notLoggedIn(session)) return "redirect:/login";
-
+    public String showAllCarsPage(@RequestParam(required = false) String sort, HttpSession session, Model model) {
         try {
             List<CarDetails> cars = carDetailsService.getAllCars();
+
+            if ("mileageDesc".equals(sort)) {
+                cars.sort((c1, c2) -> Integer.compare(c2.getMileage(), c1.getMileage()));
+            } else if ("mileageAsc".equals(sort)) {
+                cars.sort((c1, c2) -> Integer.compare(c1.getMileage(), c2.getMileage()));
+            }
+
             model.addAttribute("cars", cars);
-            return "carDetails"; // This must match carDetails.html
+
+            if (session != null && session.getAttribute("loggedInUser") != null) {
+                model.addAttribute("username", session.getAttribute("loggedInUser"));
+            }
+
+            return "carDetails";
         } catch (Exception e) {
-            return "redirect:/dashboard";
+            return "carDetails";
         }
     }
-
-    // Search by Make (e.g., /carDetails/search?make=BMW)
     @GetMapping("/search")
     public String searchByMake(@RequestParam String make, HttpSession session, Model model) {
-        if (notLoggedIn(session)) return "redirect:/login";
-
+        // REMOVED Login check. Anyone can search!
         try {
             List<CarDetails> filteredCars = carDetailsService.getAllCars().stream()
                     .filter(c -> c.getMake().equalsIgnoreCase(make))
@@ -50,21 +55,37 @@ public class CarDetailsController {
 
             model.addAttribute("cars", filteredCars);
             model.addAttribute("searchQuery", make);
+
+            if (session.getAttribute("loggedInUser") != null) {
+                model.addAttribute("username", session.getAttribute("loggedInUser"));
+            }
             return "carDetails";
         } catch (Exception e) {
             return "redirect:/carDetails";
         }
     }
 
-    // View specific car by ID (e.g., /carDetails/1)
+    @GetMapping("/contact")
+    public String showContactPage(HttpSession session, Model model) {
+        if (session.getAttribute("loggedInUser") != null) {
+            model.addAttribute("username", session.getAttribute("loggedInUser"));
+        }
+        return "contact";
+    }
+    @GetMapping("/location")
+    public String showLocationPage(HttpSession session, Model model) {
+        if (session.getAttribute("loggedInUser") != null) {
+            model.addAttribute("username", session.getAttribute("loggedInUser"));
+        }
+        return "location";
+    }
+
     @GetMapping("/{id}")
     public String getCarById(@PathVariable int id, HttpSession session, Model model) {
-        if (notLoggedIn(session)) return "redirect:/login";
-
         try {
             CarDetails car = carDetailsService.getCarById(id);
             model.addAttribute("car", car);
-            return "carView"; // Requires a carView.html file
+            return "carView";
         } catch (Exception e) {
             return "redirect:/carDetails";
         }
