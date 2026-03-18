@@ -2,10 +2,13 @@ package SpringProject.services;
 
 import SpringProject.dtos.Bookings;
 import SpringProject.persistences.BookingsDao;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.List;
 
+
+@Service
 public class BookingService  {
     private final BookingsDao bookingsDao;
 
