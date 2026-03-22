@@ -90,6 +90,21 @@ amount DECIMAL (10,2) NOT NULL,
 FOREIGN KEY (bookingId) REFERENCES bookings(bookingId) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS return_inspections (
+inspectionId INT AUTO_INCREMENT PRIMARY KEY,
+bookingId INT NOT NULL,
+inspectedByUserId INT NOT NULL,
+actualReturnDate DATE NOT NULL,
+returnedOnTime BOOLEAN NOT NULL DEFAULT 1,
+damageFound BOOLEAN NOT NULL DEFAULT 0,
+damageNotes VARCHAR(500),
+mileageIn INT,
+fuelLevel VARCHAR(30),
+inspectedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (bookingId) REFERENCES bookings(bookingId),
+FOREIGN KEY (inspectedByUserId) REFERENCES users(userId)
+);
+
 
 
 CREATE INDEX idx_payment_booking ON payment (bookingId);
