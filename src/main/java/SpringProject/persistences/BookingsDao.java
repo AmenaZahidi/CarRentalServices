@@ -19,7 +19,7 @@ public interface BookingsDao {
     List<Bookings> getAllBookings() throws SQLException;
     Bookings getBookingsById(int bookingId) throws SQLException;
     boolean deleteBooking(int bookingId) throws SQLException;
-    boolean AddBookings(Bookings bookings) throws SQLException;
+    boolean addBookings(Bookings bookings) throws SQLException;
     boolean updateBooking(Bookings booking) throws SQLException;
 
 }

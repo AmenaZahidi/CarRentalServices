@@ -30,10 +30,18 @@ public class Bookings {
     @NonNull
     private int bookingId;
     @NonNull
+    private int driverId;
+    @NonNull
+    private int userId;
+    @NonNull
+    private int carId;
+    @NonNull
+    private int pickupLocationId;
+    @NonNull
     private Date pickupDateTime;
     @NonNull
     private Date returnDateTime;
-
+@NonNull
     private double totalPrice;
     @NonNull
     private String status;

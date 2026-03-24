@@ -113,5 +113,14 @@ public class BookingController {
             model.addAttribute("error", "Database error");
             return "error";
         }
+
     }
+
+//    @PostMapping("/booking/save")
+//    public String saveBooking(@ModelAttribute Bookings booking) {
+//
+//        bookingService.save(booking);
+//
+//        return "redirect:/booking/myBookings";
+//    }
 }
