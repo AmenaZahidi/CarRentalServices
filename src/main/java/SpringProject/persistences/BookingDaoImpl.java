@@ -16,8 +16,11 @@ import java.util.List;
 @Slf4j
 public class BookingDaoImpl implements BookingsDao {
     private Connector connector;
-    private Connection conn;
-public BookingDaoImpl(Connector connector) {this.connector = connector;}
+
+    public BookingDaoImpl(Connector connector) {
+        this.connector = connector;
+    }
+
     @Override
     public List<Bookings> getAllBookings() throws SQLException {
         List<Bookings> bookings = new ArrayList<>();
@@ -26,7 +29,7 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
         if (conn == null) throw new SQLException("getAllBookings(): Could not establish connection to database.");
 
         String sql = """
-                SELECT bookingId, pickupDatetime, returnDatetime, status, totalPrice
+                SELECT bookingId, driverId,userId, carId, pickupLocationId, pickupDatetime, returnDatetime, status, totalPrice
                 FROM Bookings
                 ORDER BY bookingId
                 """;
@@ -46,13 +49,14 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
         return bookings;
     }
 
+    //public Bookings save(int booking)
     @Override
     public Bookings getBookingsById(int bookingId) throws SQLException {
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("getBookingsById(): Could not establish connection to database.");
 
         String sql = """
-                SELECT bookingId, pickupDatetime, returnDatetime, status, totalPrice
+                SELECT bookingId, driverId, userId, carId, pickupLocationId, pickupDatetime, returnDatetime, status, totalPrice
                 FROM Bookings
                 WHERE bookingId = ?
                 """;
@@ -77,20 +81,20 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
     @Override
     public boolean deleteBooking(int bookingId) throws SQLException {
         Connection conn = connector.getConnection();
-        String sql="DELETE FROM bookings WHERE bookingId =?";
-        try(PreparedStatement ps = conn.prepareStatement(sql)){
+        String sql = "DELETE FROM bookings WHERE bookingId =?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, bookingId);
-            return ps.executeUpdate()>0;
-        }catch(SQLException e){
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
             log.info("deleteBooking(): SQL Exception occurred when attempting to prepare SQL for execution" + e.getMessage());
         }
         return false;
     }
 
     @Override
-    public boolean AddBookings(Bookings bookings) throws SQLException {
+    public boolean addBookings(Bookings bookings) throws SQLException {
         boolean added = false;
-        conn = connector.getConnection();
+        Connection conn = connector.getConnection();
 
         if (bookings == null) {
             throw new IllegalArgumentException("Booking cant be null");
@@ -99,19 +103,24 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
             throw new SQLException("Could not establish connection to database");
         }
         int addedRows = 0;
-        String sql = "INSERT INTO bookings ( pickupDatetime, returnDatetime, status, totalPrice) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO bookings (driverId, userId, carId, pickupLocationId, pickupDatetime, returnDatetime, status, totalPrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setTimestamp(1, new java.sql.Timestamp(bookings.getPickupDateTime().getTime()));
-            ps.setTimestamp(2,new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
-            ps.setString(3, bookings.getStatus());
-            ps.setDouble(4, bookings.getTotalPrice());
+            ps.setInt(1, bookings.getDriverId());
+            ps.setInt(2, bookings.getUserId());
+            ps.setInt(3, bookings.getCarId());
+            ps.setInt(4, bookings.getPickupLocationId());
+            ps.setTimestamp(5, new java.sql.Timestamp(bookings.getPickupDateTime().getTime()));
+            ps.setTimestamp(6, new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
+            ps.setString(7, bookings.getStatus());
+            ps.setDouble(8, bookings.getTotalPrice());
             addedRows = ps.executeUpdate();
-        }
-        catch (SQLException e){
+        } catch (SQLException e) {
             log.error(("The SQL query could not be executed: " + e.getMessage()));
             throw e;
+        }finally{
+            connector.freeConnection();
         }
-        return addedRows ==1;
+        return addedRows == 1;
     }
 
     @Override
@@ -124,7 +133,7 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setTimestamp(1, new java.sql.Timestamp(bookings.getPickupDateTime().getTime()));
-            ps.setTimestamp(2,new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
+            ps.setTimestamp(2, new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
             ps.setString(3, bookings.getStatus());
             ps.setDouble(4, bookings.getTotalPrice());
             ps.setInt(5, bookings.getBookingId());
@@ -142,8 +151,12 @@ public BookingDaoImpl(Connector connector) {this.connector = connector;}
     private static Bookings mapBookingsRow(ResultSet rs) throws SQLException{
         return Bookings.builder()
                 .bookingId(rs.getInt("bookingId"))
-                .pickupDateTime(rs.getTimestamp("pickupDateTime"))
-                .returnDateTime(rs.getTimestamp("returnDateTime"))
+                .driverId(rs.getInt("driverId"))
+                .userId(rs.getInt("userId"))
+                .carId(rs.getInt("carId"))
+                .pickupDateTime(rs.getTimestamp("pickupDatetime"))
+                .returnDateTime(rs.getTimestamp("returnDatetime"))
+                .pickupLocationId(rs.getInt("pickupLocationId"))
                 .totalPrice(rs.getDouble("totalPrice"))
                 .status(rs.getString("status"))
                 .build();
