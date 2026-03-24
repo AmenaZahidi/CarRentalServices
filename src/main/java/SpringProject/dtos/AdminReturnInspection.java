@@ -10,13 +10,13 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class AdminReturnInspection {
+
     private Integer inspectionId;
     private Integer bookingId;
     private Integer inspectedByUserId;
 
     private LocalDate actualReturnDate;
     private boolean returnedOnTime;
-
     private boolean damageFound;
     private String damageNotes;
 

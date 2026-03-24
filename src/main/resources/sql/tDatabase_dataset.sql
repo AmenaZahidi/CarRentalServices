@@ -1,12 +1,13 @@
 
 
+USE tdatabase;
+USE tDatabase;
 
+INSERT INTO users (username, password, email, userType)
+VALUES ('admin', 'admin123', 'admin@test.com', 2);
 
-
-INSERT INTO addresses (addressLine1, addressLine2, city, county, postcode, country) VALUES
-('12 Main Street', 'Apt 3B', 'Dundalk', 'Louth', 'A91 XY23', 'Ireland'),
-('45 Oakwood Drive', NULL, 'Drogheda', 'Louth', 'A92 HT71', 'Ireland'),
-('7 Riverbank Close', NULL, 'Ardee', 'Louth', 'A92 P9K4', 'Ireland');
+INSERT INTO addresses (addressLine1, addressLine2, city, county, postcode)
+VALUES ('123 Admin St', 'Suite 1', 'Dundalk', 'Louth', 'A91 X123');
 
 INSERT INTO users (addressId, username, email, dateOfBirth, password, userType) VALUES
 (1, 'john_doe', 'john@example.com', '1990-05-12', 'hashedpass1', 1),
