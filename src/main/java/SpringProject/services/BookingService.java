@@ -20,7 +20,7 @@ public class BookingService  {
         if (booking == null) {
             throw new IllegalArgumentException("Booking cannot be null");
         }
-        return bookingsDao.AddBookings(booking);
+        return bookingsDao.addBookings(booking);
     }
 
     public Bookings getBookingById(int bookingId) throws SQLException {
