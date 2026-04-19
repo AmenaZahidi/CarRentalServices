@@ -404,6 +404,7 @@ public class UserDaoImpl implements UserDao{
                 .username(rs.getString("username"))
                 .password(rs.getString("password"))
                 .email(rs.getString("email"))
+                .dateOfBirth(rs.getDate("dateOfBirth"))
                 .userType(rs.getInt("userType"))
 
                 .build();

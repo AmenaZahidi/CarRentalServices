@@ -31,7 +31,75 @@ public class CarDetailsDaoImpl implements CarDetailsDao {
                 .transmission(rs.getString("transmission"))
                 .currentStatus(rs.getString("currentStatus"))
                 .fuelType(rs.getString("fuelType"))
+                .dailyRate(calculateDailyRate(rs.getInt("carYear"), rs.getString("fuelType"), rs.getString("transmission")))
+                .imageUrl(getCarImageUrl(rs.getString("make"), rs.getString("model")))
                 .build();
+    }
+
+    private static double calculateDailyRate(int carYear, String fuelType, String transmission) {
+        double rate = 42.0;
+
+        if (carYear >= 2022) {
+            rate += 18.0;
+        } else if (carYear >= 2020) {
+            rate += 10.0;
+        } else if (carYear <= 2018) {
+            rate -= 4.0;
+        }
+
+        if ("electric".equalsIgnoreCase(fuelType)) {
+            rate += 14.0;
+        } else if ("hybrid".equalsIgnoreCase(fuelType)) {
+            rate += 9.0;
+        } else if ("diesel".equalsIgnoreCase(fuelType)) {
+            rate += 5.0;
+        }
+
+        if ("automatic".equalsIgnoreCase(transmission)) {
+            rate += 6.0;
+        }
+
+        return Math.max(rate, 35.0);
+    }
+
+    private static String getCarImageUrl(String make, String model) {
+        String carName = ((make == null ? "" : make) + " " + (model == null ? "" : model)).toLowerCase();
+
+        if (carName.contains("toyota")) {
+            return "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?q=80&w=1200&auto=format&fit=crop";
+        }
+        if (carName.contains("volkswagen") || carName.contains("golf")) {
+            return "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=1200&auto=format&fit=crop";
+        }
+        if (carName.contains("nissan") || carName.contains("leaf")) {
+            return "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=1200&auto=format&fit=crop";
+        }
+        if (carName.contains("bmw")) {
+            return "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1200&auto=format&fit=crop";
+        }
+        if (carName.contains("audi")) {
+            return "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?q=80&w=1200&auto=format&fit=crop";
+        }
+        if (carName.contains("ford")) {
+            return "https://images.unsplash.com/photo-1590362891991-f776e747a588?q=80&w=1200&auto=format&fit=crop";
+        }
+        if (carName.contains("hyundai")) {
+            return "https://images.unsplash.com/photo-1609521263047-f8f205293f24?q=80&w=1200&auto=format&fit=crop";
+        }
+        if (carName.contains("tesla")) {
+            return "https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=1200&auto=format&fit=crop";
+        }
+        if (carName.contains("kia")) {
+            return "https://images.unsplash.com/photo-1609521263047-f8f205293f24?q=80&w=1200&auto=format&fit=crop";
+        }
+        if (carName.contains("mercedes")) {
+            return "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1200&auto=format&fit=crop";
+        }
+        if (carName.contains("skoda")) {
+            return "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?q=80&w=1200&auto=format&fit=crop";
+        }
+
+        return "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=1200&auto=format&fit=crop";
     }
 
     @Override
@@ -40,6 +108,8 @@ public class CarDetailsDaoImpl implements CarDetailsDao {
 
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("getAllCars(): Could not establish connection to database.");
+
+        ensureSampleCars(conn);
 
         String sql = """
                 SELECT carId, regNumber, make, model, carYear, colour, mileage,
@@ -129,6 +199,8 @@ public class CarDetailsDaoImpl implements CarDetailsDao {
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("getAvailableCars(): Could not establish connection to database.");
 
+        ensureSampleCars(conn);
+
         String sql = """
                 SELECT carId, regNumber, make, model, carYear, colour, mileage,
                        transmission, currentStatus, fuelType
@@ -214,6 +286,27 @@ public class CarDetailsDaoImpl implements CarDetailsDao {
             throw e;
         } finally {
             connector.freeConnection();
+        }
+    }
+
+    private void ensureSampleCars(Connection conn) throws SQLException {
+        String sql = """
+                INSERT IGNORE INTO carDetails
+                    (regNumber, make, model, carYear, colour, mileage, transmission, currentStatus, fuelType)
+                VALUES
+                    ('222D45781', 'BMW', '3 Series', 2022, 'Black', 18000, 'automatic', 'available', 'petrol'),
+                    ('231D77890', 'Audi', 'A4', 2023, 'Grey', 12000, 'automatic', 'available', 'diesel'),
+                    ('202D33445', 'Ford', 'Focus', 2020, 'Red', 39000, 'manual', 'available', 'petrol'),
+                    ('211L90876', 'Hyundai', 'Tucson', 2021, 'White', 28000, 'automatic', 'available', 'hybrid'),
+                    ('232C11223', 'Tesla', 'Model 3', 2023, 'Blue', 9000, 'automatic', 'available', 'electric'),
+                    ('191G66118', 'Kia', 'Sportage', 2019, 'Silver', 47000, 'manual', 'available', 'diesel'),
+                    ('221D77001', 'Mercedes-Benz', 'C-Class', 2022, 'Navy', 21000, 'automatic', 'available', 'petrol'),
+                    ('201D88002', 'Skoda', 'Octavia', 2020, 'Green', 36000, 'manual', 'available', 'diesel'),
+                    ('241D99112', 'Toyota', 'Yaris Cross', 2024, 'Pearl', 5000, 'automatic', 'available', 'hybrid')
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.executeUpdate();
         }
     }
 }

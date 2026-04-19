@@ -3,112 +3,244 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Create Booking | Dundalk Drive</title>
+    <title th:text="${pageTitle != null ? pageTitle : 'Booking'}">Booking</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
-            url('https://images.unsplash.com/photo-1549918830-11ec394593f3?q=80&w=2000&auto=format&fit=crop');
+            background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+            url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop');
             background-size: cover;
+            background-position: center;
             background-attachment: fixed;
-            color:white;
-            min-height:100vh;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        .navbar-custom { background:#1c1c1e; border-bottom:1px solid #3a3a3c; }
-        .nav-link { color:#f2f2f7 !important; }
-        .nav-link:hover { color:#00e676 !important; }
-        .booking-card { background:white; color:#1c1c1e; border-radius:12px; padding:35px; box-shadow:0 10px 30px rgba(0,0,0,0.4); }
-        .car-preview { background:#f7f7f7; padding:20px; border-radius:10px; text-align:center; }
-        .car-preview img { height:120px; object-fit:contain; }
-        .btn-book { background:#ff5a1f; border:none; font-weight:bold; }
-        .btn-book:hover { background:#e04910; }
+        .content-wrapper { flex: 1 0 auto; }
+        .navbar { background-color: rgba(33, 37, 41, 0.9) !important; }
+        .booking-card { background: rgba(255, 255, 255, 0.96); border-radius: 15px; padding: 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+        .btn-book { background: #ff5a1f; border: none; color: white; font-weight: 700; }
+        .btn-book:hover { background: #e04910; color: white; }
+        .price-preview {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+        }
+        .footer-board {
+            background-color: rgba(33, 37, 41, 0.95);
+            color: white;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+        .social-link {
+            color: #E1306C;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .social-link:hover { color: #ff5e9a; text-decoration: underline; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
-    <div class="container">
-        <a class="navbar-brand" th:href="@{/carDetails}">DUNDALK DRIVE</a>
-        <div class="navbar-nav ms-auto">
-            <a class="nav-link" th:href="@{/carDetails}">Browse Vehicles</a>
-            <a class="nav-link" th:href="@{/booking/myBookings}">My Bookings</a>
-            <a class="nav-link text-primary" th:href="@{/logout}">Logout</a>
-        </div>
-    </div>
-</nav>
-
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="booking-card">
-                <h2 class="fw-bold mb-4">Create Booking</h2>
-
-
-                <div class="car-preview mb-4">
-                    <img th:src="${car.imageUrl != null} ? ${car.imageUrl} : 'https://www.pngall.com/wp-content/uploads/2016/07/Car-PNG-File.png'" alt="Car">
-                    <h5 class="mt-3 fw-bold" th:text="${car.make + ' ' + car.model}">BMW 3 Series</h5>
-                    <p class="text-muted" th:text="${car.carYear + ' • ' + car.transmission}">2022 • Manual</p>
+<div class="content-wrapper">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" th:href="@{/dashboard}">CarRentalServices</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" th:href="@{/dashboard}">Home</a>
+                    <a class="nav-link" th:href="@{/carDetails}">Browse Cars</a>
+                    <a class="nav-link active" th:href="@{/bookings}">Manage Bookings</a>
+                    <a class="nav-link" th:href="@{/locations}">Locations</a>
+                    <a class="nav-link" th:href="@{/contact}">Contact Us</a>
+                    <div class="ms-lg-3">
+                        <a class="btn btn-outline-danger btn-sm" th:href="@{/logout}">Logout</a>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </nav>
 
-                <!-- Booking Form -->
-                <form th:action="@{/bookings}" th:object="${booking}" method="post">
+    <main class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="booking-card">
+                    <h2 class="fw-bold mb-4" th:text="${pageTitle != null ? pageTitle : 'Booking'}">Booking</h2>
 
+                    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
 
-                    <input type="hidden" th:field= "${carId}" th:value="${car.carId}">
-                    <input type="hidden" th:field="${userId}" th:value="${loggedUserId}">
+                    <form th:action="@{${formAction}}" th:object="${booking}" method="post">
+                        <input type="hidden" th:field="*{bookingId}">
+                        <input type="hidden" th:field="*{userId}">
 
                     <div class="row g-3">
-
                         <div class="col-md-6">
-                            <label class="form-label">Pickup Date & Time</label>
-                            <input type="datetime-local" class="form-control" th:field="${pickupDateTime}" required>
+                            <label class="form-label">Customer</label>
+                            <input type="text" class="form-control"
+                                   th:value="${username != null ? username + ' (ID ' + sessionUserId + ')' : 'Logged-in customer'}"
+                                   readonly>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}"></div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label">Return Date & Time</label>
-                            <input type="datetime-local" class="form-control" th:field="${returnDateTime}" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Pickup Location</label>
-                            <select class="form-select" th:field="${pickupLocationId}">
-                                <option th:each="location : ${locations}"
-                                        th:value="${location.locationId}"
-                                        th:text="${location.branchName}">Dundalk Branch</option>
+                            <label class="form-label">Car</label>
+                            <select class="form-select" th:field="*{carId}" required>
+                                <option value="">Select a car</option>
+                                <option th:each="car : ${cars}"
+                                        th:value="${car.id}"
+                                        th:attr="data-rate=${car.dailyRate},data-transmission=${car.transmission}"
+                                        th:text="${car.label}">Toyota Corolla</option>
                             </select>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('carId')}" th:errors="*{carId}"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Driver</label>
-                            <select class="form-select" th:field="${driverId}">
+                            <select class="form-select" th:field="*{driverId}" required>
+                                <option value="">Select a driver</option>
                                 <option th:each="driver : ${drivers}"
-                                        th:value="${driver.driverId}"
-                                        th:text="${driver.firstName + ' ' + driver.lastName}">John Doe</option>
+                                        th:value="${driver.id}"
+                                        th:attr="data-permit=${driver.permitType}"
+                                        th:text="${driver.label}">John Murphy</option>
                             </select>
+                            <div class="form-text">
+                                Only drivers with a full profile and uploaded licence proof are shown.
+                                <a th:href="@{/drivers/licence-proof}">Upload licence proof</a>
+                            </div>
+                            <div class="alert alert-warning mt-2 mb-0" th:if="${#lists.isEmpty(drivers)}">
+                                No drivers are ready to book yet. A driver must upload licence proof first.
+                            </div>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('driverId')}" th:errors="*{driverId}"></div>
                         </div>
 
+                        <div class="col-md-6">
+                            <label class="form-label">Pickup Location</label>
+                            <select class="form-select" th:field="*{pickupLocationId}" required>
+                                <option value="">Select a pickup location</option>
+                                <option th:each="location : ${locations}"
+                                        th:value="${location.id}"
+                                        th:text="${location.label}">Dublin Central</option>
+                            </select>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('pickupLocationId')}" th:errors="*{pickupLocationId}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Pickup Date & Time</label>
+                            <input type="datetime-local" class="form-control" th:field="*{pickupDateTime}" required>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('pickupDateTime')}" th:errors="*{pickupDateTime}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Return Date & Time</label>
+                            <input type="datetime-local" class="form-control" th:field="*{returnDateTime}" required>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('returnDateTime')}" th:errors="*{returnDateTime}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Total Price</label>
+                            <input id="totalPrice" type="number" min="0" step="0.01" class="form-control" th:field="*{totalPrice}" readonly required>
+                            <div id="priceHelp" class="form-text">Select a car and dates to calculate the total.</div>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('totalPrice')}" th:errors="*{totalPrice}"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" th:field="*{status}" required>
+                                <option value="confirmed">confirmed</option>
+                                <option value="active">active</option>
+                                <option value="returned">returned</option>
+                                <option value="cancelled">cancelled</option>
+                            </select>
+                            <div class="text-danger small" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+                        </div>
                     </div>
 
-                    <hr class="my-4">
-                    <button class="btn btn-book w-100 py-2">Confirm Booking</button>
-                </form>
-
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-book px-4">Save Booking</button>
+                        <a class="btn btn-outline-secondary" th:href="@{/bookings}">Cancel</a>
+                    </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 </div>
+
 <footer class="footer-board text-center">
     <div class="container">
-        <p class="mb-2">© 2026 CarRentalServices. All rights reserved.</p>
+        <p class="mb-2">&copy; 2026 CarRentalServices. All rights reserved.</p>
         <div class="d-flex justify-content-center align-items-center gap-3">
             <span>Follow our journey:</span>
-            <a href="https://www.instagram.com/yourhandle" target="_blank" class="social-link">
-                📸 Instagram
-            </a>
+            <a href="https://www.instagram.com/yourhandle" target="_blank" class="social-link">Instagram</a>
         </div>
     </div>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const carSelect = document.getElementById('carId');
+    const pickupInput = document.getElementById('pickupDateTime');
+    const returnInput = document.getElementById('returnDateTime');
+    const totalPriceInput = document.getElementById('totalPrice');
+    const priceHelp = document.getElementById('priceHelp');
+    const driverSelect = document.getElementById('driverId');
+
+    function calculateBookingTotal() {
+        if (!carSelect || !pickupInput || !returnInput || !totalPriceInput) return;
+
+        const selectedCar = carSelect.options[carSelect.selectedIndex];
+        const dailyRate = selectedCar ? Number(selectedCar.dataset.rate) : 0;
+        const pickupTime = pickupInput.value ? new Date(pickupInput.value).getTime() : 0;
+        const returnTime = returnInput.value ? new Date(returnInput.value).getTime() : 0;
+
+        if (!dailyRate || !pickupTime || !returnTime || returnTime <= pickupTime) {
+            totalPriceInput.value = '';
+            priceHelp.textContent = 'Select a car and valid dates to calculate the total.';
+            return;
+        }
+
+        const dayMs = 24 * 60 * 60 * 1000;
+        const rentalDays = Math.max(1, Math.ceil((returnTime - pickupTime) / dayMs));
+        const total = dailyRate * rentalDays;
+
+        totalPriceInput.value = total.toFixed(2);
+        priceHelp.textContent = 'EUR ' + dailyRate.toFixed(2) + ' per day x ' + rentalDays + ' day' + (rentalDays === 1 ? '' : 's');
+    }
+
+    [carSelect, pickupInput, returnInput].forEach(element => {
+        if (element) element.addEventListener('change', calculateBookingTotal);
+    });
+
+    function filterDriversByCar() {
+        if (!carSelect || !driverSelect) return;
+
+        const selectedCar = carSelect.options[carSelect.selectedIndex];
+        const carTransmission = selectedCar ? selectedCar.dataset.transmission : '';
+
+        Array.from(driverSelect.options).forEach(option => {
+            if (!option.value) return;
+
+            const permitType = option.dataset.permit;
+            const canDrive = permitType === 'manual' || carTransmission === 'automatic';
+            option.hidden = !canDrive;
+            option.disabled = !canDrive;
+
+            if (!canDrive && option.selected) {
+                driverSelect.value = '';
+            }
+        });
+    }
+
+    if (carSelect) {
+        carSelect.addEventListener('change', filterDriversByCar);
+    }
+
+    calculateBookingTotal();
+    filterDriversByCar();
+</script>
+</body>
 </html>

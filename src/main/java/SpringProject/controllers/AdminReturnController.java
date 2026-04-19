@@ -31,27 +31,15 @@ public class AdminReturnController {
         this.userService = userService;
     }
 
-    // Simplified session check helper to match CarDetailsController style
     private boolean isNotAdmin(HttpSession session) {
         return false;
     }
-//    private boolean isNotAdmin(HttpSession session) {
-//        if (session == null || session.getAttribute("loggedInUser") == null) return true;
-//        Object ut = session.getAttribute("userType");
-//        return !(ut instanceof Integer && (Integer) ut == 2);
-//    }
-
-
-
-    // 1. THIS IS THE UNLOCK: It now always allows access
-
 
     @GetMapping("/return-check")
     public String showForm(@RequestParam int bookingId,
                            @RequestParam int carId,
                            HttpSession session,
                            Model model) {
-        // Even if session is empty, this will now let you through
         if (isNotAdmin(session)) return "redirect:/dashboard";
 
         model.addAttribute("bookingId", bookingId);
@@ -77,10 +65,9 @@ public class AdminReturnController {
         if (isNotAdmin(session)) return "redirect:/dashboard";
 
         try {
-            // 2. FIXED THE BUILDER ERROR: Using standard setters instead
             AdminReturnInspection inspection = new AdminReturnInspection();
             inspection.setBookingId(bookingId);
-            inspection.setInspectedByUserId(5); // Using ID 5 from your database screenshot
+            inspection.setInspectedByUserId(5);
             inspection.setActualReturnDate(actualReturnDate);
             inspection.setReturnedOnTime(returnedOnTime);
             inspection.setDamageFound(damageFound);
@@ -101,67 +88,6 @@ public class AdminReturnController {
         model.addAttribute("today", LocalDate.now());
         return "returnCheck";
     }
-
-
-
-//    @GetMapping("/return-check")
-//    public String showForm(@RequestParam int bookingId,
-//                           @RequestParam int carId,
-//                           HttpSession session,
-//                           Model model) {
-//        if (isNotAdmin(session)) return "redirect:/dashboard";
-//
-//        model.addAttribute("bookingId", bookingId);
-//        model.addAttribute("carId", carId);
-//        model.addAttribute("today", LocalDate.now());
-//
-//        // Adding username for the header if logged in
-//        model.addAttribute("username", session.getAttribute("loggedInUser"));
-//
-//        return "returnCheck";
-//    }
-//
-//    @PostMapping("/return-check")
-//    public String submitForm(@RequestParam int bookingId,
-//                             @RequestParam int carId,
-//                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate actualReturnDate,
-//                             @RequestParam(defaultValue = "false") boolean returnedOnTime,
-//                             @RequestParam(defaultValue = "false") boolean damageFound,
-//                             @RequestParam(required = false) String damageNotes,
-//                             @RequestParam(required = false) Integer mileageIn,
-//                             @RequestParam(required = false) String fuelLevel,
-//                             HttpSession session,
-//                             Model model) {
-//
-//        if (isNotAdmin(session)) return "redirect:/dashboard";
-//
-//        try {
-//            int inspectedByUserId = (int) session.getAttribute("userId");
-//
-//            AdminReturnInspection inspection = AdminReturnInspection.builder()
-//                    .bookingId(bookingId)
-//                    .inspectedByUserId(inspectedByUserId)
-//                    .actualReturnDate(actualReturnDate)
-//                    .returnedOnTime(returnedOnTime)
-//                    .damageFound(damageFound)
-//                    .damageNotes(damageNotes)
-//                    .mileageIn(mileageIn)
-//                    .fuelLevel(fuelLevel)
-//                    .build();
-//
-//            inspectionService.addInspection(inspection);
-//            carDetailsService.updateCarStatus(carId, "available");
-//
-//            model.addAttribute("success", "Car returned successfully and set to Available.");
-//        } catch (Exception e) {
-//            model.addAttribute("error", "Error: " + e.getMessage());
-//        }
-//
-//        model.addAttribute("bookingId", bookingId);
-//        model.addAttribute("carId", carId);
-//        model.addAttribute("today", LocalDate.now());
-//        return "returnCheck";
-//    }
 
     @GetMapping("/history")
     public String showInspectionHistory(HttpSession session, Model model) {

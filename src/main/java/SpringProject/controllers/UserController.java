@@ -64,7 +64,7 @@ public class UserController {
     @GetMapping("/manageBookings")
     public String showManageBookingsPage(HttpSession session) {
         if (session.getAttribute("loggedInUser") == null) return "redirect:/login";
-        return "manageBookings"; // This will look for manageBookings.html
+        return "redirect:/bookings";
     }
 
 
@@ -121,7 +121,10 @@ public class UserController {
             session.setAttribute("loggedInUser", username);
 
             User u = userService.getUserByUsername(username);
-            if (u != null) session.setAttribute("userType", u.getUserType());
+            if (u != null) {
+                session.setAttribute("userId", u.getUserId());
+                session.setAttribute("userType", u.getUserType());
+            }
 
             return "redirect:/dashboard";
 

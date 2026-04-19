@@ -47,7 +47,6 @@ public class CarDetailsController {
     }
     @GetMapping("/search")
     public String searchByMake(@RequestParam String make, HttpSession session, Model model) {
-        // REMOVED Login check. Anyone can search!
         try {
             List<CarDetails> filteredCars = carDetailsService.getAllCars().stream()
                     .filter(c -> c.getMake().equalsIgnoreCase(make))
@@ -77,7 +76,7 @@ public class CarDetailsController {
         if (session.getAttribute("loggedInUser") != null) {
             model.addAttribute("username", session.getAttribute("loggedInUser"));
         }
-        return "location";
+        return "locations";
     }
 
     @GetMapping("/{id}")

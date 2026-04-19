@@ -19,4 +19,6 @@ public class CarDetails {
     private String transmission;   // manual,  automatic
     private String currentStatus;
     private String fuelType;
+    private Double dailyRate;
+    private String imageUrl;
 }

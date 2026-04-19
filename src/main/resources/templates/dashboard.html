@@ -89,8 +89,9 @@
             <div class="collapse navbar-collapse" id="navMenu">
                 <div class="navbar-nav ms-auto">
                     <a class="nav-link active" th:href="@{/dashboard}">Home</a>
-                    <a class="nav-link" th:href="@{/carDetails.html}">Browse Cars</a>
-                    <a class="nav-link" th:href="@{/managebookings}">Manage Bookings</a>
+                    <a class="nav-link" th:href="@{/carDetails}">Browse Cars</a>
+                    <a class="nav-link" th:href="@{/bookings}">Manage Bookings</a>
+                    <a class="nav-link" th:href="@{/drivers/licence-proof}">Driver Licence</a>
                     <a class="nav-link" th:href="@{/contact}">Contact Us</a>
                     <div class="ms-lg-3">
                         <a class="btn btn-outline-danger btn-sm" th:href="@{/logout}">Logout</a>
@@ -118,7 +119,7 @@
                 </div>
             </a>
 
-            <a th:href="@{/manageBookings}" class="col-md-3 card-action">
+            <a th:href="@{/bookings}" class="col-md-3 card-action">
                 <div class="card h-100 p-4 action-card-style">
                     <div class="display-4 mb-2">📅</div>
                     <h5 class="fw-bold">Manage My Booking</h5>
@@ -139,6 +140,16 @@
                     <div class="display-4 mb-2 text-success">📞</div>
                     <h5 class="fw-bold">Contact Me</h5>
                     <p class="small text-muted">Talk to our admin team</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="row g-4 text-center mt-1">
+            <a th:href="@{/drivers/licence-proof}" class="col-md-4 mx-auto card-action">
+                <div class="card h-100 p-4 action-card-style">
+                    <div class="display-6 mb-2 fw-bold">ID</div>
+                    <h5 class="fw-bold">Driver Licence Proof</h5>
+                    <p class="small text-muted">Upload proof and choose manual or automatic licence</p>
                 </div>
             </a>
         </div>

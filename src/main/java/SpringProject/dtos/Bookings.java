@@ -15,7 +15,14 @@ FOREIGN KEY (carId) REFERENCES carDetails(carId),
 FOREIGN KEY (driverId) REFERENCES driverdetails(driverId),
 FOREIGN KEY (pickupLocationId) REFERENCES location(locationId)
         );*/
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -27,22 +34,37 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class Bookings {
-    @NonNull
-    private int bookingId;
-    @NonNull
-    private int driverId;
-    @NonNull
-    private int userId;
-    @NonNull
-    private int carId;
-    @NonNull
-    private int pickupLocationId;
-    @NonNull
+    @PositiveOrZero(message = "Booking id cannot be negative")
+    private Integer bookingId;
+
+    private Integer driverId;
+
+    @NotNull(message = "User is required")
+    @Positive(message = "User is required")
+    private Integer userId;
+
+    @NotNull(message = "Car is required")
+    @Positive(message = "Car is required")
+    private Integer carId;
+
+    @NotNull(message = "Pickup location is required")
+    @Positive(message = "Pickup location is required")
+    private Integer pickupLocationId;
+
+    @NotNull(message = "Pickup date and time is required")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private Date pickupDateTime;
-    @NonNull
+
+    @NotNull(message = "Return date and time is required")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private Date returnDateTime;
-@NonNull
-    private double totalPrice;
-    @NonNull
-    private String status;
+
+    @DecimalMin(value = "0.0", message = "Total price cannot be negative")
+    @NotNull(message = "Total price is required")
+    private Double totalPrice;
+
+    @NotBlank(message = "Status is required")
+    @Pattern(regexp = "confirmed|active|returned|cancelled",
+            message = "Status must be confirmed, active, returned, or cancelled")
+    private String status = "confirmed";
 }

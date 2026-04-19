@@ -59,6 +59,8 @@ phoneNumber VARCHAR(15),
 licenseNumber VARCHAR(20) UNIQUE NOT NULL,
 dateOfBirth DATE NOT NULL,
 permitType ENUM('manual', 'automatic'),
+licenseProofPath VARCHAR(255),
+licenseVerified BOOLEAN NOT NULL DEFAULT FALSE,
 
 FOREIGN KEY (addressId) REFERENCES addresses(addressId)
 );
@@ -87,6 +89,8 @@ paymentId INT AUTO_INCREMENT PRIMARY KEY,
 bookingId INT NOT NULL,
 paymentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 amount DECIMAL (10,2) NOT NULL,
+paymentStatus VARCHAR(30) NOT NULL DEFAULT 'paid',
+transactionRef VARCHAR(100) NOT NULL,
 FOREIGN KEY (bookingId) REFERENCES bookings(bookingId) ON DELETE CASCADE
 );
 
