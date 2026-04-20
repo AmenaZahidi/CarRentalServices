@@ -20,6 +20,7 @@ public interface UserDao {
     User getUserById(int userId)throws SQLException;
     User getUserByUsername(String username) throws SQLException;
     User getUserByEmail(String email) throws SQLException;
+    void ensureAdminUser() throws SQLException;
     boolean updateUser(User user)throws SQLException;
     boolean deleteUser(int userId) throws SQLException;
     void closeConnection() throws SQLException;

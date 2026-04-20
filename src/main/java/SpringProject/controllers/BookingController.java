@@ -33,6 +33,15 @@ public class BookingController {
         return session == null || session.getAttribute("loggedInUser") == null;
     }
 
+    private boolean isAdmin(HttpSession session) {
+        Object userType = session.getAttribute("userType");
+        return userType instanceof Integer && (Integer) userType == 2;
+    }
+
+    private String redirectAdmin(HttpSession session) {
+        return isAdmin(session) ? "redirect:/admin/dashboard" : null;
+    }
+
     private void addHeaderData(HttpSession session, Model model) {
         if (session != null) {
             model.addAttribute("username", session.getAttribute("loggedInUser"));
@@ -73,6 +82,7 @@ public class BookingController {
     @GetMapping
     public String getAllBookings(HttpSession session, Model model) {
         if (notLoggedIn(session)) return "redirect:/login";
+        if (isAdmin(session)) return "redirect:/admin/bookings";
 
         try {
             Integer userId = getSessionUserId(session);
@@ -95,6 +105,7 @@ public class BookingController {
                           HttpSession session,
                           Model model) {
         if (notLoggedIn(session)) return "redirect:/login";
+        if (isAdmin(session)) return "redirect:/admin/dashboard";
 
         Bookings booking = new Bookings();
         booking.setStatus("confirmed");
@@ -118,6 +129,7 @@ public class BookingController {
                              Model model,
                              RedirectAttributes ra) {
         if (notLoggedIn(session)) return "redirect:/login";
+        if (isAdmin(session)) return "redirect:/admin/dashboard";
 
         applySessionUser(booking, session);
         validateBookingDates(booking, bindingResult);
@@ -147,6 +159,7 @@ public class BookingController {
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable int id, HttpSession session, Model model) {
         if (notLoggedIn(session)) return "redirect:/login";
+        if (isAdmin(session)) return "redirect:/admin/bookings";
 
         try {
             Bookings booking = bookingService.getBookingById(id);
@@ -171,6 +184,7 @@ public class BookingController {
     @GetMapping("/driver-claim/{id}")
     public String driverClaimForm(@PathVariable int id, HttpSession session, Model model) {
         if (notLoggedIn(session)) return "redirect:/login";
+        if (isAdmin(session)) return "redirect:/admin/bookings";
 
         try {
             Bookings booking = bookingService.getBookingById(id);
@@ -200,6 +214,7 @@ public class BookingController {
                               Model model,
                               RedirectAttributes ra) {
         if (notLoggedIn(session)) return "redirect:/login";
+        if (isAdmin(session)) return "redirect:/admin/bookings";
 
         try {
             Bookings booking = bookingService.getBookingById(id);
@@ -268,6 +283,7 @@ public class BookingController {
                                 Model model,
                                 RedirectAttributes ra) {
         if (notLoggedIn(session)) return "redirect:/login";
+        if (isAdmin(session)) return "redirect:/admin/bookings";
 
         booking.setBookingId(id);
         applySessionUser(booking, session);
@@ -316,6 +332,7 @@ public class BookingController {
                                 HttpSession session,
                                 RedirectAttributes ra) {
         if (notLoggedIn(session)) return "redirect:/login";
+        if (isAdmin(session)) return "redirect:/admin/bookings";
 
         try {
             Bookings booking = bookingService.getBookingById(id);
@@ -339,6 +356,7 @@ public class BookingController {
     @GetMapping("/{id}")
     public String getBookingById(@PathVariable int id, HttpSession session, Model model) {
         if (notLoggedIn(session)) return "redirect:/login";
+        if (isAdmin(session)) return "redirect:/admin/bookings";
 
         try {
             Bookings booking = bookingService.getBookingById(id);

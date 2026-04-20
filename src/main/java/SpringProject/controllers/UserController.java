@@ -45,6 +45,7 @@ public class UserController {
     public String dashboard(HttpSession session, Model model) {
         Object username = session.getAttribute("loggedInUser");
         if (username == null) return "redirect:/login";
+        if (isAdmin(session)) return "redirect:/admin/dashboard";
 
         model.addAttribute("username", username.toString());
         model.addAttribute("userType", session.getAttribute("userType"));
@@ -124,6 +125,9 @@ public class UserController {
             if (u != null) {
                 session.setAttribute("userId", u.getUserId());
                 session.setAttribute("userType", u.getUserType());
+                if (u.getUserType() != null && u.getUserType() == 2) {
+                    return "redirect:/admin/dashboard";
+                }
             }
 
             return "redirect:/dashboard";
@@ -138,5 +142,10 @@ public class UserController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
+    }
+
+    private boolean isAdmin(HttpSession session) {
+        Object userType = session.getAttribute("userType");
+        return userType instanceof Integer && (Integer) userType == 2;
     }
 }

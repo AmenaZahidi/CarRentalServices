@@ -92,6 +92,7 @@
                     <a class="nav-link" th:href="@{/carDetails}">Browse Cars</a>
                     <a class="nav-link" th:href="@{/bookings}">Manage Bookings</a>
                     <a class="nav-link" th:href="@{/drivers/licence-proof}">Driver Licence</a>
+                    <a class="nav-link" th:if="${userType == 2}" th:href="@{/admin/dashboard}">Admin</a>
                     <a class="nav-link" th:href="@{/contact}">Contact Us</a>
                     <div class="ms-lg-3">
                         <a class="btn btn-outline-danger btn-sm" th:href="@{/logout}">Logout</a>
@@ -107,6 +108,7 @@
             <h1 class="display-3 fw-bold">Ready to hit the road?</h1>
             <p class="lead mb-0">Logged in as: <strong th:text="${username}">User</strong></p>
             <p class="mt-2">Welcome to your personal rental dashboard. Browse our fleet or manage your trips below.</p>
+            <a th:if="${userType == 2}" th:href="@{/admin/dashboard}" class="btn btn-warning mt-3 fw-bold">Open Admin Panel</a>
         </div>
 
         <div class="row g-4 text-center">

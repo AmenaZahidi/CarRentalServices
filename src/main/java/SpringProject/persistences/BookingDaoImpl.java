@@ -51,6 +51,70 @@ public class BookingDaoImpl implements BookingsDao {
     }
 
     @Override
+    public List<Map<String, Object>> getAdminBookingSummaries() throws SQLException {
+        List<Map<String, Object>> bookings = new ArrayList<>();
+        Connection conn = connector.getConnection();
+        if (conn == null) throw new SQLException("getAdminBookingSummaries(): Could not establish connection to database.");
+
+        ensureReturnInspectionsTable(conn);
+
+        String sql = """
+                SELECT b.bookingId, b.userId, u.username, u.email,
+                       b.carId, c.make, c.model, c.regNumber,
+                       b.driverId, d.firstName, d.lastName, d.licenseNumber,
+                       b.pickupDatetime, b.returnDatetime, b.status, b.totalPrice,
+                       p.paymentId,
+                       MAX(ri.inspectionId) AS inspectionId,
+                       COUNT(ri.inspectionId) AS inspectionCount
+                FROM bookings b
+                JOIN users u ON u.userId = b.userId
+                JOIN carDetails c ON c.carId = b.carId
+                JOIN driverdetails d ON d.driverId = b.driverId
+                LEFT JOIN payment p ON p.bookingId = b.bookingId
+                LEFT JOIN return_inspections ri ON ri.bookingId = b.bookingId
+                GROUP BY b.bookingId, b.userId, u.username, u.email,
+                         b.carId, c.make, c.model, c.regNumber,
+                         b.driverId, d.firstName, d.lastName, d.licenseNumber,
+                         b.pickupDatetime, b.returnDatetime, b.status, b.totalPrice,
+                         p.paymentId
+                ORDER BY b.pickupDatetime DESC, b.bookingId DESC
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> booking = new LinkedHashMap<>();
+                booking.put("bookingId", rs.getInt("bookingId"));
+                booking.put("userId", rs.getInt("userId"));
+                booking.put("customerName", rs.getString("username"));
+                booking.put("customerEmail", rs.getString("email"));
+                booking.put("carId", rs.getInt("carId"));
+                booking.put("carName", rs.getString("make") + " " + rs.getString("model"));
+                booking.put("regNumber", rs.getString("regNumber"));
+                booking.put("driverId", rs.getInt("driverId"));
+                booking.put("driverName", rs.getString("firstName") + " " + rs.getString("lastName"));
+                booking.put("licenseNumber", rs.getString("licenseNumber"));
+                booking.put("pickupDateTime", rs.getTimestamp("pickupDatetime"));
+                booking.put("returnDateTime", rs.getTimestamp("returnDatetime"));
+                booking.put("status", rs.getString("status"));
+                booking.put("totalPrice", rs.getDouble("totalPrice"));
+                booking.put("paid", rs.getObject("paymentId") != null);
+                booking.put("inspectionId", rs.getObject("inspectionId"));
+                booking.put("inspectionCount", rs.getInt("inspectionCount"));
+                booking.put("inspected", rs.getInt("inspectionCount") > 0);
+                bookings.add(booking);
+            }
+        } catch (SQLException e) {
+            log.error("getAdminBookingSummaries(): SQL error: {}", e.getMessage());
+            throw e;
+        } finally {
+            connector.freeConnection();
+        }
+
+        return bookings;
+    }
+
+    @Override
     public List<Bookings> getBookingsByUserId(int userId) throws SQLException {
         List<Bookings> bookings = new ArrayList<>();
         Connection conn = connector.getConnection();
@@ -476,6 +540,28 @@ public class BookingDaoImpl implements BookingsDao {
             try (java.sql.Statement statement = conn.createStatement()) {
                 statement.executeUpdate("ALTER TABLE driverdetails ADD COLUMN licenseVerified BOOLEAN NOT NULL DEFAULT FALSE");
             }
+        }
+    }
+
+    private void ensureReturnInspectionsTable(Connection conn) throws SQLException {
+        String sql = """
+                CREATE TABLE IF NOT EXISTS return_inspections (
+                    inspectionId INT AUTO_INCREMENT PRIMARY KEY,
+                    bookingId INT NOT NULL,
+                    inspectedByUserId INT NOT NULL,
+                    actualReturnDate DATE NOT NULL,
+                    returnedOnTime BOOLEAN NOT NULL DEFAULT TRUE,
+                    damageFound BOOLEAN NOT NULL DEFAULT FALSE,
+                    damageNotes TEXT,
+                    mileageIn INT,
+                    fuelLevel VARCHAR(20),
+                    FOREIGN KEY (bookingId) REFERENCES bookings(bookingId) ON DELETE CASCADE,
+                    FOREIGN KEY (inspectedByUserId) REFERENCES users(userId)
+                )
+                """;
+
+        try (java.sql.Statement statement = conn.createStatement()) {
+            statement.executeUpdate(sql);
         }
     }
 

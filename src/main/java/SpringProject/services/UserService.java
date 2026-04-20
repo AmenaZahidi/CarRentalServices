@@ -42,6 +42,10 @@ public class UserService {
         return userDao.getUserByEmail(email);
     }
 
+    public void ensureAdminUser() throws Exception {
+        userDao.ensureAdminUser();
+    }
+
     // Update/Delete
     public boolean updateUser(User user) throws Exception {
         return userDao.updateUser(user);

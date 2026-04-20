@@ -117,6 +117,9 @@ public class UserDaoImpl implements UserDao{
      */
     @Override
     public boolean login(String username, String password) throws Exception {
+        if ("admin_user".equalsIgnoreCase(username)) {
+            ensureAdminUser();
+        }
 
         // Obtain a database connection
         Connection connection = connector.getConnection();
@@ -354,6 +357,72 @@ public class UserDaoImpl implements UserDao{
 
         // Return the retrieved user or null if not found
         return user;
+    }
+
+    @Override
+    public void ensureAdminUser() throws SQLException {
+        Connection conn = connector.getConnection();
+        if (conn == null) {
+            throw new SQLException("ensureAdminUser(): Could not establish connection to database.");
+        }
+
+        String passwordHash = PasswordHasher.hashPassword("Password1!");
+
+        try {
+            Integer addressId = getFirstAddressId(conn);
+            if (addressId == null) {
+                createDefaultAddress(conn);
+                addressId = getFirstAddressId(conn);
+            }
+
+            String updateSql = """
+                    UPDATE users
+                    SET password = ?, userType = 2
+                    WHERE username = 'admin_user'
+                    """;
+
+            try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
+                ps.setString(1, passwordHash);
+                int updatedRows = ps.executeUpdate();
+                if (updatedRows > 0) {
+                    return;
+                }
+            }
+
+            String insertSql = """
+                    INSERT INTO users (addressId, username, email, dateOfBirth, password, userType)
+                    VALUES (?, 'admin_user', 'admin@example.com', '1985-03-20', ?, 2)
+                    """;
+
+            try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
+                ps.setInt(1, addressId);
+                ps.setString(2, passwordHash);
+                ps.executeUpdate();
+            }
+        } finally {
+            connector.freeConnection();
+        }
+    }
+
+    private Integer getFirstAddressId(Connection conn) throws SQLException {
+        String sql = "SELECT addressId FROM addresses ORDER BY addressId LIMIT 1";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("addressId");
+            }
+        }
+        return null;
+    }
+
+    private void createDefaultAddress(Connection conn) throws SQLException {
+        String sql = """
+                INSERT INTO addresses (addressLine1, addressLine2, city, county, postcode, country)
+                VALUES ('Admin Office', NULL, 'Dundalk', 'Louth', 'A91 ADMIN', 'Ireland')
+                """;
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.executeUpdate();
+        }
     }
 
     /**

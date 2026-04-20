@@ -35,6 +35,10 @@ public class BookingService  {
         return bookingsDao.getAllBookings();
     }
 
+    public List<Map<String, Object>> getAdminBookingSummaries() throws SQLException {
+        return bookingsDao.getAdminBookingSummaries();
+    }
+
     public List<Bookings> getBookingsByUserId(int userId) throws SQLException {
         if (userId <= 0) {
             throw new IllegalArgumentException("Invalid user Id");

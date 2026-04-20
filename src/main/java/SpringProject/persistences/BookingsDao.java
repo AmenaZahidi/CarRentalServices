@@ -17,6 +17,7 @@ status ENUM('confirmed', 'active', 'returned', 'cancelled') DEFAULT 'confirmed',
  */
 public interface BookingsDao {
     List<Bookings> getAllBookings() throws SQLException;
+    List<Map<String, Object>> getAdminBookingSummaries() throws SQLException;
     List<Bookings> getBookingsByUserId(int userId) throws SQLException;
     Bookings getBookingsById(int bookingId) throws SQLException;
     boolean deleteBooking(int bookingId) throws SQLException;
