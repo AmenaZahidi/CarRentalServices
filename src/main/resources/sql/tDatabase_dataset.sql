@@ -11,9 +11,8 @@ INSERT INTO users (addressId, username, email, dateOfBirth, password, userType) 
 (3, 'staff_mary', 'mary.staff@example.com', '1992-11-02', '$2a$12$C5vCOuYxG.WAJW4xSVMYEOe8ruelEdQ.uRcQ.KOOTkN8NX1W45Ucq', 1);
 
 INSERT INTO location (branchName, address, phoneNumber) VALUES
-('Dublin Central', '12 Main Street, Dublin', '012345678'),
-('Cork City', '45 River Road, Cork', '021987654'),
-('Galway West', '78 Ocean Drive, Galway', '091223344');
+('Dundalk Branch', 'Dublin Road, Dundalk', '0429370200'),
+('Dublin Central', '12 Main Street, Dublin', '012345678');
 
 INSERT INTO carDetails (regNumber, make, model, carYear, colour, mileage, transmission, currentStatus, fuelType) VALUES
 ('191D12345', 'Toyota', 'Corolla', 2019, 'Silver', 45000, 'automatic', 'available', 'hybrid'),
@@ -37,7 +36,7 @@ INSERT INTO driverdetails (addressId, firstName, lastName, email, phoneNumber, l
 INSERT INTO bookings (driverId, userId, carId, pickupDatetime, returnDatetime, pickupLocationId, totalPrice, status) VALUES
 (1, 1, 1, '2024-03-01 10:00:00', '2024-03-05 10:00:00', 1, 250.00, 'confirmed'),
 (2, 1, 2, '2024-03-10 09:00:00', '2024-03-12 09:00:00', 2, 180.00, 'active'),
-(1, 3, 3, '2024-02-20 14:00:00', '2024-02-22 14:00:00', 3, 150.00, 'returned');
+(1, 3, 3, '2024-02-20 14:00:00', '2024-02-22 14:00:00', 1, 150.00, 'returned');
 
 INSERT INTO payment (bookingId, amount, paymentStatus, transactionRef) VALUES
 (1, 250.00, 'paid', 'SIM-SEED-0001'),
