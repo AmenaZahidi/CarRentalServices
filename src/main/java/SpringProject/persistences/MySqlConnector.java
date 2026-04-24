@@ -34,7 +34,15 @@ public class MySqlConnector implements Connector{
     }
 
     public Connection getConnection() {
-        connection = null;
+        if (connection != null) {
+            try {
+                if (!connection.isClosed()) {
+                    return connection;
+                }
+            } catch (SQLException e) {
+                log.warn("Existing connection was invalid. A new connection will be created. {}", e.getMessage());
+            }
+        }
 
         String driver = properties.getProperty("driver", "com.mysql.cj.jdbc.Driver");
         String url = properties.getProperty("url", "jdbc:mysql://127.0.0.1:3306/");

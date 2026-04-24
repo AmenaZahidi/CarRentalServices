@@ -20,9 +20,19 @@ public class CarDetailsController {
         this.carDetailsService = carDetailsService;
     }
 
-    private boolean notLoggedIn(HttpSession session) {
-        return session == null || session.getAttribute("loggedInUser") == null;
+    private boolean isLoggedIn(HttpSession session) {
+        return session != null && session.getAttribute("loggedInUser") != null;
     }
+
+    private void addLoginStatus(HttpSession session, Model model) {
+        boolean loggedIn = isLoggedIn(session);
+        model.addAttribute("loggedIn", loggedIn);
+
+        if (loggedIn) {
+            model.addAttribute("username", session.getAttribute("loggedInUser"));
+        }
+    }
+
     @GetMapping
     public String showAllCarsPage(@RequestParam(required = false) String sort, HttpSession session, Model model) {
         try {
@@ -35,13 +45,11 @@ public class CarDetailsController {
             }
 
             model.addAttribute("cars", cars);
-
-            if (session != null && session.getAttribute("loggedInUser") != null) {
-                model.addAttribute("username", session.getAttribute("loggedInUser"));
-            }
+            addLoginStatus(session, model);
 
             return "carDetails";
         } catch (Exception e) {
+            addLoginStatus(session, model);
             return "carDetails";
         }
     }
@@ -54,10 +62,7 @@ public class CarDetailsController {
 
             model.addAttribute("cars", filteredCars);
             model.addAttribute("searchQuery", make);
-
-            if (session.getAttribute("loggedInUser") != null) {
-                model.addAttribute("username", session.getAttribute("loggedInUser"));
-            }
+            addLoginStatus(session, model);
             return "carDetails";
         } catch (Exception e) {
             return "redirect:/carDetails";

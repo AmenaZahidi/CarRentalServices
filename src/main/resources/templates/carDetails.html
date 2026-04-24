@@ -80,18 +80,20 @@
 <div class="content-wrapper">
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" th:href="@{/dashboard}">CarRentalServices</a>
+            <a class="navbar-brand fw-bold" th:href="${loggedIn} ? @{/dashboard} : @{/carDetails}">CarRentalServices</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navMenu">
                 <div class="navbar-nav ms-auto">
-                    <a class="nav-link" th:href="@{/dashboard}">Home</a>
+                    <a class="nav-link" th:if="${loggedIn}" th:href="@{/dashboard}">Home</a>
                     <a class="nav-link active" th:href="@{/carDetails}">Browse Cars</a>
-                    <a class="nav-link" th:href="@{/bookings}">Manage Bookings</a>
-                    <a class="nav-link" th:href="@{/locations}">Locations</a>
-                    <a class="nav-link" th:href="@{/contact}">Contact Us</a>
-                    <div class="ms-lg-3">
+                    <a class="nav-link" th:if="${loggedIn}" th:href="@{/bookings}">Manage Bookings</a>
+                    <a class="nav-link" th:if="${loggedIn}" th:href="@{/locations}">Locations</a>
+                    <a class="nav-link" th:if="${loggedIn}" th:href="@{/contact}">Contact Us</a>
+                    <a class="nav-link" th:unless="${loggedIn}" th:href="@{/login}">Login</a>
+                    <a class="nav-link" th:unless="${loggedIn}" th:href="@{/register}">Register</a>
+                    <div class="ms-lg-3" th:if="${loggedIn}">
                         <a class="btn btn-outline-danger btn-sm" th:href="@{/logout}">Logout</a>
                     </div>
                 </div>
@@ -134,7 +136,7 @@
                                 <div class="small text-muted mt-1" th:text="${car.mileage + ' km'}">0 km</div>
                             </div>
 
-                            <a th:href="@{/bookings/create(carId=${car.carId})}" class="btn btn-view-deal py-2">View Deal</a>
+                            <a th:href="${loggedIn} ? @{/bookings/create(carId=${car.carId})} : @{/login}" class="btn btn-view-deal py-2">View Deal</a>
                         </div>
                     </div>
                 </div>
