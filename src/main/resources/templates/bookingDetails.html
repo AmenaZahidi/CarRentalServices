@@ -37,7 +37,8 @@
         .social-link:hover { color: #ff5e9a; text-decoration: underline; }
     </style>
 </head>
-<body>
+<body class="vanta-page">
+<div th:replace="fragments/vantaBackground :: vantaBackground"></div>
 <div class="content-wrapper">
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
@@ -86,6 +87,9 @@
                 <dt class="col-sm-3">Pickup Location ID</dt>
                 <dd class="col-sm-9" th:text="${booking.pickupLocationId}">1</dd>
 
+                <dt class="col-sm-3">Drop-off Location ID</dt>
+                <dd class="col-sm-9" th:text="${booking.dropOffLocationId}">1</dd>
+
                 <dt class="col-sm-3">Pickup</dt>
                 <dd class="col-sm-9" th:text="${#dates.format(booking.pickupDateTime, 'yyyy-MM-dd HH:mm')}">2026-01-01 10:00</dd>
 
@@ -109,7 +113,7 @@
                 <a class="btn btn-outline-secondary" th:href="@{/bookings}">Back</a>
                 <a class="btn btn-success" th:if="${payment == null}" th:href="@{/payments/{id}(id=${booking.bookingId})}">Pay Now</a>
                 <a class="btn btn-outline-success" th:if="${payment != null}" th:href="@{/payments/{id}(id=${booking.bookingId})}">View Payment</a>
-                <a class="btn btn-primary" th:href="@{/bookings/edit/{id}(id=${booking.bookingId})}">Edit</a>
+                <a class="btn btn-primary" th:href="@{/bookings/edit/{id}(id=${booking.bookingId})}">Change Booking</a>
             </div>
         </div>
     </main>

@@ -7,13 +7,15 @@ package SpringProject.dtos;
         pickupDatetime DATETIME NOT NULL,
         returnDatetime DATETIME NOT NULL,
         pickupLocationId INT,
+        dropOffLocationId INT,
         totalPrice DECIMAL(10, 2),
 status ENUM('confirmed', 'active', 'returned', 'cancelled') DEFAULT 'confirmed',
 
 FOREIGN KEY (userId) REFERENCES users(userId),
 FOREIGN KEY (carId) REFERENCES carDetails(carId),
 FOREIGN KEY (driverId) REFERENCES driverdetails(driverId),
-FOREIGN KEY (pickupLocationId) REFERENCES location(locationId)
+FOREIGN KEY (pickupLocationId) REFERENCES location(locationId),
+FOREIGN KEY (dropOffLocationId) REFERENCES location(locationId)
         );*/
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -51,6 +53,10 @@ public class Bookings {
     @Positive(message = "Pickup location is required")
     private Integer pickupLocationId;
 
+    @NotNull(message = "Drop-off location is required")
+    @Positive(message = "Drop-off location is required")
+    private Integer dropOffLocationId;
+
     @NotNull(message = "Pickup date and time is required")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private Date pickupDateTime;
@@ -60,7 +66,6 @@ public class Bookings {
     private Date returnDateTime;
 
     @DecimalMin(value = "0.0", message = "Total price cannot be negative")
-    @NotNull(message = "Total price is required")
     private Double totalPrice;
 
     @NotBlank(message = "Status is required")

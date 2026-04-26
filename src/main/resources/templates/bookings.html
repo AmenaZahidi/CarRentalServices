@@ -37,7 +37,8 @@
         .social-link:hover { color: #ff5e9a; text-decoration: underline; }
     </style>
 </head>
-<body>
+<body class="vanta-page">
+<div th:replace="fragments/vantaBackground :: vantaBackground"></div>
 <div class="content-wrapper">
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
@@ -77,6 +78,7 @@
                         <th>ID</th>
                         <th>Car</th>
                         <th>Driver</th>
+                        <th>Pickup/Drop-off</th>
                         <th>Pickup</th>
                         <th>Return</th>
                         <th>Status</th>
@@ -88,19 +90,20 @@
                         <td th:text="${booking.bookingId}">1</td>
                         <td th:text="${booking.carId}">1</td>
                         <td th:text="${booking.driverId}">1</td>
+                        <td th:text="${booking.pickupLocationId + ' / ' + booking.dropOffLocationId}">1 / 1</td>
                         <td th:text="${#dates.format(booking.pickupDateTime, 'yyyy-MM-dd HH:mm')}">2026-01-01 10:00</td>
                         <td th:text="${#dates.format(booking.returnDateTime, 'yyyy-MM-dd HH:mm')}">2026-01-02 10:00</td>
                         <td th:text="${booking.status}">confirmed</td>
                         <td class="text-end">
                             <a class="btn btn-sm btn-outline-primary" th:href="@{/bookings/{id}(id=${booking.bookingId})}">View</a>
                             <a class="btn btn-sm btn-success" th:href="@{/payments/{id}(id=${booking.bookingId})}">Pay Now</a>
-                            <a class="btn btn-sm btn-outline-secondary" th:href="@{/bookings/edit/{id}(id=${booking.bookingId})}">Edit</a>
+                            <a class="btn btn-sm btn-outline-secondary" th:href="@{/bookings/edit/{id}(id=${booking.bookingId})}">Change Booking</a>
                             <a class="btn btn-sm btn-outline-success" th:href="@{/bookings/driver-claim/{id}(id=${booking.bookingId})}">Driver ID</a>
                             <a class="btn btn-sm btn-outline-danger" th:href="@{/bookings/delete/{id}(id=${booking.bookingId})}">Delete</a>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(bookings)}">
-                        <td colspan="7" class="text-center py-4 text-muted">No bookings found.</td>
+                        <td colspan="8" class="text-center py-4 text-muted">No bookings found.</td>
                     </tr>
                     </tbody>
                 </table>

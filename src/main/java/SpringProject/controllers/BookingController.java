@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 @Controller
 @RequestMapping("/bookings")
@@ -71,11 +73,23 @@ public class BookingController {
                                     Bookings booking,
                                     String formAction,
                                     String pageTitle) throws SQLException {
+        List<Map<String, Object>> cars = bookingService.getCarOptions();
+        List<Map<String, Object>> drivers = bookingService.getDriverOptions();
+        List<Map<String, Object>> locations = bookingService.getLocationOptions();
+
         model.addAttribute("formAction", formAction);
         model.addAttribute("pageTitle", pageTitle);
-        model.addAttribute("cars", bookingService.getCarOptions());
-        model.addAttribute("drivers", bookingService.getDriverOptions());
-        model.addAttribute("locations", bookingService.getLocationOptions());
+        model.addAttribute("cars", cars);
+        model.addAttribute("drivers", drivers);
+        model.addAttribute("locations", locations);
+        model.addAttribute("isEditMode", formAction != null && formAction.contains("/edit/"));
+        if (booking != null) {
+            model.addAttribute("selectedCarLabel", findLabel(cars, booking.getCarId()));
+            model.addAttribute("selectedDriverLabel", findLabel(drivers, booking.getDriverId()));
+            model.addAttribute("selectedPickupLocationLabel", findLabel(locations, booking.getPickupLocationId()));
+            model.addAttribute("selectedDropOffLocationLabel", findLabel(locations, booking.getDropOffLocationId()));
+            model.addAttribute("selectedCarRate", findNumber(cars, booking.getCarId(), "dailyRate"));
+        }
         addHeaderData(session, model);
     }
 
@@ -427,6 +441,13 @@ public class BookingController {
                 bindingResult.rejectValue("pickupLocationId", "booking.pickupLocationId.invalid",
                         "Pickup Location ID does not exist.");
             }
+
+            if (booking.getDropOffLocationId() != null
+                    && booking.getDropOffLocationId() > 0
+                    && !bookingService.locationExists(booking.getDropOffLocationId())) {
+                bindingResult.rejectValue("dropOffLocationId", "booking.dropOffLocationId.invalid",
+                        "Drop-off Location ID does not exist.");
+            }
         } catch (SQLException e) {
             bindingResult.reject("booking.references.database",
                     "Could not validate booking IDs. Please try again.");
@@ -464,5 +485,39 @@ public class BookingController {
         } catch (SQLException e) {
             model.addAttribute("error", "Could not reload booking form choices.");
         }
+    }
+
+    private String findLabel(List<Map<String, Object>> options, Integer id) {
+        if (id == null || options == null) {
+            return "";
+        }
+
+        for (Map<String, Object> option : options) {
+            Object optionId = option.get("id");
+            if (optionId instanceof Number && ((Number) optionId).intValue() == id) {
+                Object label = option.get("label");
+                return label != null ? label.toString() : "";
+            }
+        }
+
+        return "";
+    }
+
+    private Double findNumber(List<Map<String, Object>> options, Integer id, String key) {
+        if (id == null || options == null) {
+            return null;
+        }
+
+        for (Map<String, Object> option : options) {
+            Object optionId = option.get("id");
+            if (optionId instanceof Number && ((Number) optionId).intValue() == id) {
+                Object value = option.get(key);
+                if (value instanceof Number) {
+                    return ((Number) value).doubleValue();
+                }
+            }
+        }
+
+        return null;
     }
 }

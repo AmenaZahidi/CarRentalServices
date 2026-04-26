@@ -28,8 +28,10 @@ public class BookingDaoImpl implements BookingsDao {
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("getAllBookings(): Could not establish connection to database.");
 
+        ensureBookingColumns(conn);
+
         String sql = """
-                SELECT bookingId, driverId, userId, carId, pickupLocationId,
+                SELECT bookingId, driverId, userId, carId, pickupLocationId, dropOffLocationId,
                        pickupDatetime, returnDatetime, status, totalPrice
                 FROM bookings
                 ORDER BY bookingId
@@ -56,6 +58,7 @@ public class BookingDaoImpl implements BookingsDao {
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("getAdminBookingSummaries(): Could not establish connection to database.");
 
+        ensureBookingColumns(conn);
         ensureReturnInspectionsTable(conn);
 
         String sql = """
@@ -120,8 +123,10 @@ public class BookingDaoImpl implements BookingsDao {
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("getBookingsByUserId(): Could not establish connection to database.");
 
+        ensureBookingColumns(conn);
+
         String sql = """
-                SELECT bookingId, driverId, userId, carId, pickupLocationId,
+                SELECT bookingId, driverId, userId, carId, pickupLocationId, dropOffLocationId,
                        pickupDatetime, returnDatetime, status, totalPrice
                 FROM bookings
                 WHERE userId = ?
@@ -151,8 +156,10 @@ public class BookingDaoImpl implements BookingsDao {
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("getBookingsById(): Could not establish connection to database.");
 
+        ensureBookingColumns(conn);
+
         String sql = """
-                SELECT bookingId, driverId, userId, carId, pickupLocationId,
+                SELECT bookingId, driverId, userId, carId, pickupLocationId, dropOffLocationId,
                        pickupDatetime, returnDatetime, status, totalPrice
                 FROM bookings
                 WHERE bookingId = ?
@@ -181,6 +188,8 @@ public class BookingDaoImpl implements BookingsDao {
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("deleteBooking(): Could not establish connection to database.");
 
+        ensureBookingColumns(conn);
+
         String sql = "DELETE FROM bookings WHERE bookingId = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, bookingId);
@@ -202,10 +211,12 @@ public class BookingDaoImpl implements BookingsDao {
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("addBookings(): Could not establish connection to database.");
 
+        ensureBookingColumns(conn);
+
         String sql = """
                 INSERT INTO bookings
-                    (driverId, userId, carId, pickupLocationId, pickupDatetime, returnDatetime, status, totalPrice)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    (driverId, userId, carId, pickupLocationId, dropOffLocationId, pickupDatetime, returnDatetime, status, totalPrice)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -213,10 +224,11 @@ public class BookingDaoImpl implements BookingsDao {
             ps.setInt(2, bookings.getUserId());
             ps.setInt(3, bookings.getCarId());
             ps.setInt(4, bookings.getPickupLocationId());
-            ps.setTimestamp(5, new java.sql.Timestamp(bookings.getPickupDateTime().getTime()));
-            ps.setTimestamp(6, new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
-            ps.setString(7, bookings.getStatus());
-            ps.setDouble(8, bookings.getTotalPrice());
+            ps.setInt(5, bookings.getDropOffLocationId());
+            ps.setTimestamp(6, new java.sql.Timestamp(bookings.getPickupDateTime().getTime()));
+            ps.setTimestamp(7, new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
+            ps.setString(8, bookings.getStatus());
+            ps.setDouble(9, bookings.getTotalPrice());
             return ps.executeUpdate() == 1;
         } catch (SQLException e) {
             log.error("addBookings(): SQL error: {}", e.getMessage());
@@ -235,10 +247,12 @@ public class BookingDaoImpl implements BookingsDao {
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("updateBooking(): Could not establish connection to database.");
 
+        ensureBookingColumns(conn);
+
         String sql = """
                 UPDATE bookings
                 SET driverId = ?, userId = ?, carId = ?, pickupLocationId = ?,
-                    pickupDatetime = ?, returnDatetime = ?, totalPrice = ?, status = ?
+                    dropOffLocationId = ?, pickupDatetime = ?, returnDatetime = ?, totalPrice = ?, status = ?
                 WHERE bookingId = ?
                 """;
 
@@ -247,11 +261,12 @@ public class BookingDaoImpl implements BookingsDao {
             ps.setInt(2, bookings.getUserId());
             ps.setInt(3, bookings.getCarId());
             ps.setInt(4, bookings.getPickupLocationId());
-            ps.setTimestamp(5, new java.sql.Timestamp(bookings.getPickupDateTime().getTime()));
-            ps.setTimestamp(6, new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
-            ps.setDouble(7, bookings.getTotalPrice());
-            ps.setString(8, bookings.getStatus());
-            ps.setInt(9, bookings.getBookingId());
+            ps.setInt(5, bookings.getDropOffLocationId());
+            ps.setTimestamp(6, new java.sql.Timestamp(bookings.getPickupDateTime().getTime()));
+            ps.setTimestamp(7, new java.sql.Timestamp(bookings.getReturnDateTime().getTime()));
+            ps.setDouble(8, bookings.getTotalPrice());
+            ps.setString(9, bookings.getStatus());
+            ps.setInt(10, bookings.getBookingId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             log.error("updateBooking(): SQL error: {}", e.getMessage());
@@ -265,6 +280,8 @@ public class BookingDaoImpl implements BookingsDao {
     public boolean updateBookingDriver(int bookingId, int driverId) throws SQLException {
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("updateBookingDriver(): Could not establish connection to database.");
+
+        ensureBookingColumns(conn);
 
         String sql = "UPDATE bookings SET driverId = ? WHERE bookingId = ?";
 
@@ -368,7 +385,32 @@ public class BookingDaoImpl implements BookingsDao {
 
     @Override
     public boolean locationExists(int locationId) throws SQLException {
-        return existsById("location", "locationId", locationId);
+        Connection conn = connector.getConnection();
+        if (conn == null) throw new SQLException("locationExists(): Could not establish connection to database.");
+
+        String sql = """
+                SELECT 1
+                FROM location
+                WHERE locationId = ?
+                  AND (
+                      LOWER(branchName) LIKE '%dundalk%'
+                      OR LOWER(branchName) LIKE '%dublin%'
+                  )
+                LIMIT 1
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, locationId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            log.error("locationExists(): SQL error: {}", e.getMessage());
+            throw e;
+        } finally {
+            connector.freeConnection();
+        }
     }
 
     @Override
@@ -464,8 +506,7 @@ public class BookingDaoImpl implements BookingsDao {
                 Map<String, Object> driver = new LinkedHashMap<>();
                 driver.put("id", rs.getInt("driverId"));
                 driver.put("label", rs.getString("firstName") + " " + rs.getString("lastName")
-                        + " - " + rs.getString("licenseNumber")
-                        + " (" + rs.getString("permitType") + ")");
+                        + " - " + rs.getString("licenseNumber"));
                 driver.put("permitType", rs.getString("permitType"));
                 driver.put("email", rs.getString("email"));
                 drivers.add(driver);
@@ -487,6 +528,8 @@ public class BookingDaoImpl implements BookingsDao {
         String sql = """
                 SELECT locationId, branchName, address, phoneNumber
                 FROM location
+                WHERE LOWER(branchName) LIKE '%dundalk%'
+                   OR LOWER(branchName) LIKE '%dublin%'
                 ORDER BY branchName
                 """;
 
@@ -494,9 +537,13 @@ public class BookingDaoImpl implements BookingsDao {
              ResultSet rs = ps.executeQuery()) {
             List<Map<String, Object>> locations = new ArrayList<>();
             while (rs.next()) {
+                String branchName = rs.getString("branchName");
+                if (!isBookingLocation(branchName)) {
+                    continue;
+                }
                 Map<String, Object> location = new LinkedHashMap<>();
                 location.put("id", rs.getInt("locationId"));
-                location.put("label", rs.getString("branchName") + " - " + rs.getString("address"));
+                location.put("label", simplifyLocationLabel(branchName));
                 location.put("phoneNumber", rs.getString("phoneNumber"));
                 locations.add(location);
             }
@@ -527,6 +574,36 @@ public class BookingDaoImpl implements BookingsDao {
         } finally {
             connector.freeConnection();
         }
+    }
+
+    private void ensureBookingColumns(Connection conn) throws SQLException {
+        if (!hasColumn(conn, "bookings", "dropOffLocationId")) {
+            try (java.sql.Statement statement = conn.createStatement()) {
+                statement.executeUpdate("ALTER TABLE bookings ADD COLUMN dropOffLocationId INT");
+            }
+        }
+    }
+
+    private boolean isBookingLocation(String branchName) {
+        if (branchName == null) {
+            return false;
+        }
+        String normalized = branchName.toLowerCase();
+        return normalized.contains("dundalk") || normalized.contains("dublin");
+    }
+
+    private String simplifyLocationLabel(String branchName) {
+        if (branchName == null) {
+            return "";
+        }
+        String normalized = branchName.toLowerCase();
+        if (normalized.contains("dundalk")) {
+            return "Dundalk";
+        }
+        if (normalized.contains("dublin")) {
+            return "Dublin";
+        }
+        return branchName;
     }
 
     private void ensureDriverLicenceColumns(Connection conn) throws SQLException {
@@ -605,6 +682,7 @@ public class BookingDaoImpl implements BookingsDao {
                 .userId(rs.getInt("userId"))
                 .carId(rs.getInt("carId"))
                 .pickupLocationId(rs.getInt("pickupLocationId"))
+                .dropOffLocationId(rs.getInt("dropOffLocationId"))
                 .pickupDateTime(rs.getTimestamp("pickupDatetime"))
                 .returnDateTime(rs.getTimestamp("returnDatetime"))
                 .totalPrice(rs.getDouble("totalPrice"))
