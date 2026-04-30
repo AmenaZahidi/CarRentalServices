@@ -46,6 +46,10 @@ public class DriverLicenceService {
         return driverLicenceDao.getLicenceProofs();
     }
 
+    public Map<String, Object> getDriverByUserId(int userId) throws SQLException {
+        return driverLicenceDao.getDriverByUserId(userId);
+    }
+
     public boolean approveLicence(int driverId) throws SQLException {
         if (driverId <= 0) {
             throw new IllegalArgumentException("Invalid driver ID.");

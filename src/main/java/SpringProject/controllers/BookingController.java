@@ -2,6 +2,7 @@ package SpringProject.controllers;
 
 import SpringProject.dtos.Bookings;
 import SpringProject.services.BookingService;
+import SpringProject.services.DriverLicenceService;
 import SpringProject.services.PaymentService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -24,10 +25,14 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/bookings")
 public class BookingController {
     private final BookingService bookingService;
+    private final DriverLicenceService driverLicenceService;
     private final PaymentService paymentService;
 
-    public BookingController(BookingService bookingService, PaymentService paymentService) {
+    public BookingController(BookingService bookingService,
+                             DriverLicenceService driverLicenceService,
+                             PaymentService paymentService) {
         this.bookingService = bookingService;
+        this.driverLicenceService = driverLicenceService;
         this.paymentService = paymentService;
     }
 
@@ -68,24 +73,51 @@ public class BookingController {
         }
     }
 
+    private void applyLoggedInDriver(Bookings booking, HttpSession session) {
+        Integer userId = getSessionUserId(session);
+        if (userId == null || booking == null) {
+            return;
+        }
+
+        try {
+            Map<String, Object> driver = driverLicenceService.getDriverByUserId(userId);
+            if (driver != null) {
+                Object driverId = driver.get("driverId");
+                if (driverId instanceof Number) {
+                    booking.setDriverId(((Number) driverId).intValue());
+                }
+            }
+        } catch (SQLException e) {
+            booking.setDriverId(null);
+        }
+    }
+
     private void addBookingFormData(HttpSession session,
                                     Model model,
                                     Bookings booking,
                                     String formAction,
                                     String pageTitle) throws SQLException {
         List<Map<String, Object>> cars = bookingService.getCarOptions();
-        List<Map<String, Object>> drivers = bookingService.getDriverOptions();
         List<Map<String, Object>> locations = bookingService.getLocationOptions();
+        Map<String, Object> driver = null;
+        Integer userId = getSessionUserId(session);
+        if (userId != null) {
+            try {
+                driver = driverLicenceService.getDriverByUserId(userId);
+            } catch (SQLException e) {
+                driver = null;
+            }
+        }
 
         model.addAttribute("formAction", formAction);
         model.addAttribute("pageTitle", pageTitle);
         model.addAttribute("cars", cars);
-        model.addAttribute("drivers", drivers);
         model.addAttribute("locations", locations);
+        model.addAttribute("driver", driver);
         model.addAttribute("isEditMode", formAction != null && formAction.contains("/edit/"));
         if (booking != null) {
             model.addAttribute("selectedCarLabel", findLabel(cars, booking.getCarId()));
-            model.addAttribute("selectedDriverLabel", findLabel(drivers, booking.getDriverId()));
+            model.addAttribute("selectedDriverLabel", booking.getDriverId() != null ? "Driver ID " + booking.getDriverId() : "");
             model.addAttribute("selectedPickupLocationLabel", findLabel(locations, booking.getPickupLocationId()));
             model.addAttribute("selectedDropOffLocationLabel", findLabel(locations, booking.getDropOffLocationId()));
             model.addAttribute("selectedCarRate", findNumber(cars, booking.getCarId(), "dailyRate"));
@@ -125,6 +157,7 @@ public class BookingController {
         booking.setStatus("confirmed");
         if (carId != null) booking.setCarId(carId);
         applySessionUser(booking, session);
+        applyLoggedInDriver(booking, session);
 
         try {
             model.addAttribute("booking", booking);
@@ -146,6 +179,7 @@ public class BookingController {
         if (isAdmin(session)) return "redirect:/admin/dashboard";
 
         applySessionUser(booking, session);
+        applyLoggedInDriver(booking, session);
         validateBookingDates(booking, bindingResult);
         applyCalculatedTotal(booking, bindingResult);
         validateBookingReferences(booking, bindingResult);
@@ -419,20 +453,19 @@ public class BookingController {
                         "Car ID does not exist.");
             }
 
-            if (booking.getDriverId() == null || booking.getDriverId() <= 0) {
-                bindingResult.rejectValue("driverId", "booking.driverId.required",
-                        "Driver is required.");
-            } else if (!bookingService.driverExists(booking.getDriverId())) {
-                bindingResult.rejectValue("driverId", "booking.driverId.invalid",
-                        "Driver ID does not exist.");
-            } else if (!bookingService.driverHasCompleteProfile(booking.getDriverId())) {
-                bindingResult.rejectValue("driverId", "booking.driverId.profileIncomplete",
-                        "Driver must complete their profile and upload licence proof before booking.");
-            } else if (booking.getCarId() != null
-                    && booking.getCarId() > 0
-                    && !bookingService.driverCanDriveCar(booking.getDriverId(), booking.getCarId())) {
-                bindingResult.rejectValue("driverId", "booking.driverId.licenceType",
-                        "Automatic licence holders cannot book a manual car.");
+            if (booking.getDriverId() != null && booking.getDriverId() > 0) {
+                if (!bookingService.driverExists(booking.getDriverId())) {
+                    bindingResult.rejectValue("driverId", "booking.driverId.invalid",
+                            "Driver ID does not exist.");
+                } else if (!bookingService.driverHasCompleteProfile(booking.getDriverId())) {
+                    bindingResult.rejectValue("driverId", "booking.driverId.profileIncomplete",
+                            "Driver must complete their profile and upload licence proof before booking.");
+                } else if (booking.getCarId() != null
+                        && booking.getCarId() > 0
+                        && !bookingService.driverCanDriveCar(booking.getDriverId(), booking.getCarId())) {
+                    bindingResult.rejectValue("driverId", "booking.driverId.licenceType",
+                            "Automatic licence holders cannot book a manual car.");
+                }
             }
 
             if (booking.getPickupLocationId() != null

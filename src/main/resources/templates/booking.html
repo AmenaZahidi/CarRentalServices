@@ -42,7 +42,6 @@
     </style>
 </head>
 <body class="vanta-page">
-<div th:replace="fragments/vantaBackground :: vantaBackground"></div>
 
 <div class="content-wrapper">
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
@@ -77,117 +76,99 @@
                     <form th:action="@{${formAction}}" th:object="${booking}" method="post">
                         <input type="hidden" th:field="*{bookingId}">
                         <input type="hidden" th:field="*{userId}">
-                        <input id="totalPrice" type="hidden" th:field="*{totalPrice}">
-                        <input th:if="${isEditMode}" id="carDailyRate" type="hidden" th:value="${selectedCarRate}">
-                        <input th:if="${isEditMode}" type="hidden" th:field="*{carId}">
-                        <input th:if="${isEditMode}" type="hidden" th:field="*{driverId}">
+                        <input th:if="${!isEditMode}" type="hidden" name="status" value="confirmed">
                         <input th:if="${isEditMode}" type="hidden" th:field="*{status}">
+                        <input id="carDailyRate" type="hidden" th:value="${selectedCarRate}">
+                        <input id="totalPrice" type="hidden" th:field="*{totalPrice}">
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Customer</label>
-                            <input type="text" class="form-control"
-                                   th:value="${username != null ? username : 'Logged-in customer'}"
-                                   readonly>
-                            <div class="text-danger small" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Car</label>
-                            <select class="form-select" th:field="*{carId}" th:if="${!isEditMode}" required>
-                                <option value="">Select a car</option>
-                                <option th:each="car : ${cars}"
-                                        th:value="${car.id}"
-                                        th:attr="data-rate=${car.dailyRate},data-transmission=${car.transmission}"
-                                        th:text="${car.label}">Toyota Corolla</option>
-                            </select>
-                            <input th:if="${isEditMode}" type="text" class="form-control" th:value="${selectedCarLabel}" readonly>
-                            <div class="form-text" th:if="${isEditMode}">The booked car cannot be changed here.</div>
-                            <div class="text-danger small" th:if="${#fields.hasErrors('carId')}" th:errors="*{carId}"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Driver</label>
-                            <select class="form-select" th:field="*{driverId}" th:if="${!isEditMode}" required>
-                                <option value="">Select a driver</option>
-                                <option th:each="driver : ${drivers}"
-                                        th:value="${driver.id}"
-                                        th:attr="data-permit=${driver.permitType}"
-                                        th:text="${(driver.permitType == 'automatic' ? 'Automatic licence holder - ' : 'Manual licence holder - ') + driver.label}">Manual licence holder - John Murphy</option>
-                            </select>
-                            <input th:if="${isEditMode}" type="text" class="form-control" th:value="${selectedDriverLabel}" readonly>
-                            <div class="form-text" th:if="${isEditMode}">The assigned driver cannot be changed here.</div>
-                            <div class="form-text">
-                                Only drivers with a full profile and uploaded licence proof are shown.
-                                <a th:href="@{/drivers/licence-proof}">Upload licence proof</a>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Customer</label>
+                                <input type="text" class="form-control" th:value="${username != null ? username : 'Logged-in customer'}" readonly>
                             </div>
-                            <div class="alert alert-warning mt-2 mb-0" th:if="${#lists.isEmpty(drivers)}">
-                                No drivers are ready to book yet. A driver must upload licence proof first.
+                            <div class="col-md-6">
+                                <label class="form-label">Car</label>
+                                <select class="form-select" th:field="*{carId}" required>
+                                    <option value="">Select a car</option>
+                                    <option th:each="car : ${cars}"
+                                            th:value="${car.id}"
+                                            th:attr="data-rate=${car.dailyRate},data-transmission=${car.transmission}"
+                                            th:text="${car.label}">Toyota Corolla</option>
+                                </select>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('carId')}" th:errors="*{carId}"></div>
                             </div>
-                            <div class="text-danger small" th:if="${#fields.hasErrors('driverId')}" th:errors="*{driverId}"></div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Driver</label>
+                                <div th:if="${!isEditMode}">
+                                    <div th:if="${driver != null}">
+                                        <input type="text" class="form-control" th:value="${driver.name}" readonly>
+                                        <input type="hidden" th:field="*{driverId}" th:value="${driver.driverId}">
+                                        <div class="form-text">Only your driver is shown here.</div>
+                                    </div>
+                                    <div th:if="${driver == null}">
+                                        <p class="mb-2 text-muted">Please upload your licence before booking</p>
+                                        <a class="btn btn-outline-primary btn-sm" th:href="@{/drivers/licence-proof}">Upload Licence</a>
+                                    </div>
+                                </div>
+                                <div th:if="${isEditMode}">
+                                    <input type="text" class="form-control" th:value="${selectedDriverLabel != null ? selectedDriverLabel : 'Not assigned'}" readonly>
+                                    <input type="hidden" th:field="*{driverId}">
+                                    <div class="form-text">The assigned driver cannot be changed here.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Pickup Location</label>
+                                <select class="form-select" th:field="*{pickupLocationId}" required>
+                                    <option value="">Select a pickup location</option>
+                                    <option th:each="location : ${locations}"
+                                            th:value="${location.id}"
+                                            th:text="${location.label}">Dublin Central</option>
+                                </select>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('pickupLocationId')}" th:errors="*{pickupLocationId}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Drop-off Location</label>
+                                <select class="form-select" th:field="*{dropOffLocationId}" required>
+                                    <option value="">Select a drop-off location</option>
+                                    <option th:each="location : ${locations}"
+                                            th:value="${location.id}"
+                                            th:text="${location.label}">Dublin Central</option>
+                                </select>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('dropOffLocationId')}" th:errors="*{dropOffLocationId}"></div>
+                            </div>
+                            <div class="col-md-6"></div>
+
+                            <div class="col-12">
+                                <label class="form-label">Pickup Date &amp; Time</label>
+                                <input type="datetime-local" class="form-control" th:field="*{pickupDateTime}" required>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('pickupDateTime')}" th:errors="*{pickupDateTime}"></div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Return Date &amp; Time</label>
+                                <input type="datetime-local" class="form-control" th:field="*{returnDateTime}" required>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('returnDateTime')}" th:errors="*{returnDateTime}"></div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Total Price</label>
+                                <input id="totalPriceDisplay" type="text" class="form-control bg-light" value="Calculated automatically" readonly>
+                                <div id="priceHelp" class="form-text">Select a car and dates to calculate the total.</div>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('totalPrice')}" th:errors="*{totalPrice}"></div>
+                            </div>
+
+                            <div class="col-12 d-none">
+                                <label class="form-label">Status</label>
+                                <input type="text" class="form-control" th:value="${booking.status != null ? booking.status : 'confirmed'}" readonly>
+                            </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label">Pickup Location</label>
-                            <select class="form-select" th:field="*{pickupLocationId}" required>
-                                <option value="">Select a pickup location</option>
-                                <option th:each="location : ${locations}"
-                                        th:value="${location.id}"
-                                        th:text="${location.label}">Dublin Central</option>
-                            </select>
-                            <div class="form-text">Pickup and drop-off locations are Dundalk and Dublin only.</div>
-                            <div class="text-danger small" th:if="${#fields.hasErrors('pickupLocationId')}" th:errors="*{pickupLocationId}"></div>
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-book px-4" th:text="${isEditMode ? 'Update Booking' : 'Save Booking'}">Save Booking</button>
+                            <a class="btn btn-outline-secondary" th:href="@{/bookings}">Cancel</a>
                         </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Drop-off Location</label>
-                            <select class="form-select" th:field="*{dropOffLocationId}" required>
-                                <option value="">Select a drop-off location</option>
-                                <option th:each="location : ${locations}"
-                                        th:value="${location.id}"
-                                        th:text="${location.label}">Dublin Central</option>
-                            </select>
-                            <div class="form-text">Return the car to Dundalk or Dublin only.</div>
-                            <div class="text-danger small" th:if="${#fields.hasErrors('dropOffLocationId')}" th:errors="*{dropOffLocationId}"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Pickup Date & Time</label>
-                            <input type="datetime-local" class="form-control" th:field="*{pickupDateTime}" required>
-                            <div class="text-danger small" th:if="${#fields.hasErrors('pickupDateTime')}" th:errors="*{pickupDateTime}"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Return Date & Time</label>
-                            <input type="datetime-local" class="form-control" th:field="*{returnDateTime}" required>
-                            <div class="text-danger small" th:if="${#fields.hasErrors('returnDateTime')}" th:errors="*{returnDateTime}"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Total Price</label>
-                            <div id="totalPriceDisplay" class="form-control bg-light">Calculated automatically</div>
-                            <div id="priceHelp" class="form-text">Select a car and dates to calculate the total.</div>
-                            <div class="text-danger small" th:if="${#fields.hasErrors('totalPrice')}" th:errors="*{totalPrice}"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" th:field="*{status}" th:if="${!isEditMode}" required>
-                                <option value="confirmed">confirmed</option>
-                                <option value="active">active</option>
-                                <option value="returned">returned</option>
-                                <option value="cancelled">cancelled</option>
-                            </select>
-                            <input th:if="${isEditMode}" type="text" class="form-control" th:value="${booking.status}" readonly>
-                            <div class="form-text" th:if="${isEditMode}">Status is managed by staff and payment flow.</div>
-                            <div class="text-danger small" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-book px-4" th:text="${isEditMode ? 'Update Booking' : 'Save Booking'}">Save Booking</button>
-                        <a class="btn btn-outline-secondary" th:href="@{/bookings}">Cancel</a>
-                    </div>
                     </form>
                 </div>
             </div>
@@ -214,8 +195,6 @@
     const totalPriceInput = document.getElementById('totalPrice');
     const totalPriceDisplay = document.getElementById('totalPriceDisplay');
     const priceHelp = document.getElementById('priceHelp');
-    const driverSelect = document.getElementById('driverId');
-
     function getDailyRate() {
         if (carSelect && carSelect.options.length > 0) {
             const selectedCar = carSelect.options[carSelect.selectedIndex];
@@ -231,10 +210,18 @@
         const dailyRate = getDailyRate();
         const pickupTime = pickupInput.value ? new Date(pickupInput.value).getTime() : 0;
         const returnTime = returnInput.value ? new Date(returnInput.value).getTime() : 0;
+        const invalidDates = pickupTime && returnTime && returnTime <= pickupTime;
 
-        if (!dailyRate || !pickupTime || !returnTime || returnTime <= pickupTime) {
+        if (pickupInput) {
+            pickupInput.setCustomValidity('');
+        }
+        if (returnInput) {
+            returnInput.setCustomValidity(invalidDates ? 'Return date and time must be after pickup date and time.' : '');
+        }
+
+        if (!dailyRate || !pickupTime || !returnTime || invalidDates) {
             totalPriceInput.value = '';
-            if (totalPriceDisplay) totalPriceDisplay.textContent = 'Calculated automatically';
+            if (totalPriceDisplay) totalPriceDisplay.value = 'Calculated automatically';
             priceHelp.textContent = 'Select a car and valid dates to calculate the total.';
             return;
         }
@@ -244,7 +231,7 @@
         const total = dailyRate * rentalDays;
 
         totalPriceInput.value = total.toFixed(2);
-        if (totalPriceDisplay) totalPriceDisplay.textContent = 'EUR ' + total.toFixed(2);
+        if (totalPriceDisplay) totalPriceDisplay.value = 'EUR ' + total.toFixed(2);
         priceHelp.textContent = 'EUR ' + dailyRate.toFixed(2) + ' per day x ' + rentalDays + ' day' + (rentalDays === 1 ? '' : 's');
     }
 
@@ -252,32 +239,7 @@
         if (element) element.addEventListener('change', calculateBookingTotal);
     });
 
-    function filterDriversByCar() {
-        if (!carSelect || !driverSelect) return;
-
-        const selectedCar = carSelect.options[carSelect.selectedIndex];
-        const carTransmission = selectedCar ? selectedCar.dataset.transmission : '';
-
-        Array.from(driverSelect.options).forEach(option => {
-            if (!option.value) return;
-
-            const permitType = option.dataset.permit;
-            const canDrive = permitType === 'manual' || carTransmission === 'automatic';
-            option.hidden = !canDrive;
-            option.disabled = !canDrive;
-
-            if (!canDrive && option.selected) {
-                driverSelect.value = '';
-            }
-        });
-    }
-
-    if (carSelect) {
-        carSelect.addEventListener('change', filterDriversByCar);
-    }
-
     calculateBookingTotal();
-    filterDriversByCar();
 </script>
 </body>
 </html>

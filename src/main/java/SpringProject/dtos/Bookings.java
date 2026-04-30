@@ -41,8 +41,6 @@ public class Bookings {
 
     private Integer driverId;
 
-    @NotNull(message = "User is required")
-    @Positive(message = "User is required")
     private Integer userId;
 
     @NotNull(message = "Car is required")

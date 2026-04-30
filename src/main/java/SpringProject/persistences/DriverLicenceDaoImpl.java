@@ -135,6 +135,59 @@ public class DriverLicenceDaoImpl implements DriverLicenceDao {
     }
 
     @Override
+    public Map<String, Object> getDriverByUserId(int userId) throws SQLException {
+        if (userId <= 0) {
+            return null;
+        }
+
+        Connection conn = connector.getConnection();
+        if (conn == null) throw new SQLException("getDriverByUserId(): Could not establish connection to database.");
+
+        try {
+            ensureLicenceColumns(conn);
+
+            boolean hasUserIdColumn = hasColumn(conn, "driverdetails", "userId");
+            String sql = hasUserIdColumn
+                    ? """
+                    SELECT driverId, firstName, lastName, email, licenseNumber, permitType, licenseVerified
+                    FROM driverdetails
+                    WHERE userId = ?
+                    LIMIT 1
+                    """
+                    : """
+                    SELECT driverId, firstName, lastName, email, licenseNumber, permitType, licenseVerified
+                    FROM driverdetails
+                    WHERE driverId = ?
+                    LIMIT 1
+                    """;
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, userId);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        return null;
+                    }
+
+                    Map<String, Object> driver = new LinkedHashMap<>();
+                    driver.put("driverId", rs.getInt("driverId"));
+                    driver.put("name", rs.getString("firstName") + " " + rs.getString("lastName"));
+                    driver.put("email", rs.getString("email"));
+                    driver.put("licenseNumber", rs.getString("licenseNumber"));
+                    driver.put("permitType", rs.getString("permitType"));
+                    driver.put("licenseVerified", rs.getBoolean("licenseVerified"));
+                    return driver;
+                }
+            }
+        } catch (SQLException e) {
+            log.error("getDriverByUserId(): SQL error: {}", e.getMessage());
+            throw e;
+        } finally {
+            connector.freeConnection();
+        }
+    }
+
+    @Override
     public boolean updateLicenceVerification(int driverId, boolean verified) throws SQLException {
         Connection conn = connector.getConnection();
         if (conn == null) throw new SQLException("updateLicenceVerification(): Could not establish connection to database.");

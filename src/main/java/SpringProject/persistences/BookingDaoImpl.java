@@ -72,7 +72,7 @@ public class BookingDaoImpl implements BookingsDao {
                 FROM bookings b
                 JOIN users u ON u.userId = b.userId
                 JOIN carDetails c ON c.carId = b.carId
-                JOIN driverdetails d ON d.driverId = b.driverId
+                LEFT JOIN driverdetails d ON d.driverId = b.driverId
                 LEFT JOIN payment p ON p.bookingId = b.bookingId
                 LEFT JOIN return_inspections ri ON ri.bookingId = b.bookingId
                 GROUP BY b.bookingId, b.userId, u.username, u.email,
@@ -94,8 +94,11 @@ public class BookingDaoImpl implements BookingsDao {
                 booking.put("carId", rs.getInt("carId"));
                 booking.put("carName", rs.getString("make") + " " + rs.getString("model"));
                 booking.put("regNumber", rs.getString("regNumber"));
-                booking.put("driverId", rs.getInt("driverId"));
-                booking.put("driverName", rs.getString("firstName") + " " + rs.getString("lastName"));
+                Integer driverId = (Integer) rs.getObject("driverId");
+                booking.put("driverId", driverId);
+                String firstName = rs.getString("firstName");
+                String lastName = rs.getString("lastName");
+                booking.put("driverName", firstName != null && lastName != null ? firstName + " " + lastName : null);
                 booking.put("licenseNumber", rs.getString("licenseNumber"));
                 booking.put("pickupDateTime", rs.getTimestamp("pickupDatetime"));
                 booking.put("returnDateTime", rs.getTimestamp("returnDatetime"));
@@ -220,7 +223,11 @@ public class BookingDaoImpl implements BookingsDao {
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, bookings.getDriverId());
+            if (bookings.getDriverId() == null) {
+                ps.setNull(1, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(1, bookings.getDriverId());
+            }
             ps.setInt(2, bookings.getUserId());
             ps.setInt(3, bookings.getCarId());
             ps.setInt(4, bookings.getPickupLocationId());
@@ -257,7 +264,11 @@ public class BookingDaoImpl implements BookingsDao {
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, bookings.getDriverId());
+            if (bookings.getDriverId() == null) {
+                ps.setNull(1, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(1, bookings.getDriverId());
+            }
             ps.setInt(2, bookings.getUserId());
             ps.setInt(3, bookings.getCarId());
             ps.setInt(4, bookings.getPickupLocationId());
@@ -582,6 +593,12 @@ public class BookingDaoImpl implements BookingsDao {
                 statement.executeUpdate("ALTER TABLE bookings ADD COLUMN dropOffLocationId INT");
             }
         }
+
+        if (!isColumnNullable(conn, "bookings", "driverId")) {
+            try (java.sql.Statement statement = conn.createStatement()) {
+                statement.executeUpdate("ALTER TABLE bookings MODIFY COLUMN driverId INT NULL");
+            }
+        }
     }
 
     private boolean isBookingLocation(String branchName) {
@@ -649,6 +666,18 @@ public class BookingDaoImpl implements BookingsDao {
         }
     }
 
+    private boolean isColumnNullable(Connection conn, String tableName, String columnName) throws SQLException {
+        java.sql.DatabaseMetaData metaData = conn.getMetaData();
+        try (ResultSet rs = metaData.getColumns(conn.getCatalog(), null, tableName, columnName)) {
+            if (!rs.next()) {
+                return true;
+            }
+
+            String nullable = rs.getString("IS_NULLABLE");
+            return "YES".equalsIgnoreCase(nullable);
+        }
+    }
+
     private static double calculateDailyRate(int carYear, String fuelType, String transmission) {
         double rate = 42.0;
 
@@ -678,7 +707,7 @@ public class BookingDaoImpl implements BookingsDao {
     private static Bookings mapBookingsRow(ResultSet rs) throws SQLException {
         return Bookings.builder()
                 .bookingId(rs.getInt("bookingId"))
-                .driverId(rs.getInt("driverId"))
+                .driverId((Integer) rs.getObject("driverId"))
                 .userId(rs.getInt("userId"))
                 .carId(rs.getInt("carId"))
                 .pickupLocationId(rs.getInt("pickupLocationId"))

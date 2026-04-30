@@ -6,7 +6,10 @@ import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -37,6 +40,25 @@ public class BookingService  {
 
     public List<Map<String, Object>> getAdminBookingSummaries() throws SQLException {
         return bookingsDao.getAdminBookingSummaries();
+    }
+
+    public List<Map<String, Object>> filterAdminBookingSummaries(String customerName,
+                                                                 String paymentStatus,
+                                                                 String pickupDate) throws SQLException {
+        List<Map<String, Object>> all = getAdminBookingSummaries();
+        if (all == null || all.isEmpty()) {
+            return all;
+        }
+
+        String nameFilter = customerName == null ? "" : customerName.trim().toLowerCase(Locale.ROOT);
+        String paymentFilter = paymentStatus == null ? "" : paymentStatus.trim().toLowerCase(Locale.ROOT);
+        String dateFilter = pickupDate == null ? "" : pickupDate.trim();
+
+        return all.stream()
+                .filter(booking -> matchesCustomerName(booking, nameFilter))
+                .filter(booking -> matchesPaymentStatus(booking, paymentFilter))
+                .filter(booking -> matchesPickupDate(booking, dateFilter))
+                .collect(Collectors.toList());
     }
 
     public List<Bookings> getBookingsByUserId(int userId) throws SQLException {
@@ -117,6 +139,40 @@ public class BookingService  {
 
     public List<Map<String, Object>> getLocationOptions() throws SQLException {
         return bookingsDao.getLocationOptions();
+    }
+
+    private boolean matchesCustomerName(Map<String, Object> booking, String filter) {
+        if (filter == null || filter.isEmpty()) {
+            return true;
+        }
+
+        String customerName = Objects.toString(booking.get("customerName"), "").toLowerCase(Locale.ROOT);
+        return customerName.contains(filter);
+    }
+
+    private boolean matchesPaymentStatus(Map<String, Object> booking, String filter) {
+        if (filter == null || filter.isEmpty()) {
+            return true;
+        }
+
+        Object paidValue = booking.get("paid");
+        boolean paid = paidValue instanceof Boolean && (Boolean) paidValue;
+        if ("paid".equalsIgnoreCase(filter)) {
+            return paid;
+        }
+        if ("unpaid".equalsIgnoreCase(filter)) {
+            return !paid;
+        }
+        return true;
+    }
+
+    private boolean matchesPickupDate(Map<String, Object> booking, String filter) {
+        if (filter == null || filter.isEmpty()) {
+            return true;
+        }
+
+        Object pickupValue = booking.get("pickupDateTime");
+        return pickupValue != null && pickupValue.toString().contains(filter);
     }
 
 

@@ -69,15 +69,23 @@ public class AdminReturnController {
     }
 
     @GetMapping("/bookings")
-    public String adminBookings(HttpSession session, Model model) {
+    public String adminBookings(@RequestParam(required = false) String customerName,
+                                @RequestParam(required = false) String paymentStatus,
+                                @RequestParam(required = false) String pickupDate,
+                                HttpSession session,
+                                Model model) {
         if (isNotAdmin(session)) return "redirect:/dashboard";
 
         try {
-            model.addAttribute("bookings", bookingService.getAdminBookingSummaries());
+            model.addAttribute("bookings",
+                    bookingService.filterAdminBookingSummaries(customerName, paymentStatus, pickupDate));
         } catch (Exception e) {
             model.addAttribute("error", "Bookings could not be loaded.");
         }
 
+        model.addAttribute("customerName", customerName);
+        model.addAttribute("paymentStatus", paymentStatus);
+        model.addAttribute("pickupDate", pickupDate);
         addHeaderData(session, model);
         return "adminBookings";
     }
