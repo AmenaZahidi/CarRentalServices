@@ -1,8 +1,8 @@
 package org.example.carrentalservices;
 
-import SpringProject.dtos.Bookings;
-import SpringProject.persistences.BookingDaoImpl;
+import SpringProject.dtos.Payment;
 import SpringProject.persistences.Connector;
+import SpringProject.persistences.PaymentDaoImpl;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationHandler;
@@ -12,7 +12,6 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,133 +22,51 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class BookingDaoImplTest {
+class PaymentDaoImplTest {
 
     @Test
-    void addBookingsReturnsTrueWhenInsertSucceeds() throws Exception {
+    void addPaymentWritesAllFieldsWhenColumnsExist() throws Exception {
         FakeJdbc jdbc = new FakeJdbc();
-        BookingDaoImpl dao = new BookingDaoImpl(jdbc.connector());
+        PaymentDaoImpl dao = new PaymentDaoImpl(jdbc.connector());
 
-        Bookings booking = Bookings.builder()
-                .driverId(3)
-                .userId(7)
-                .carId(11)
-                .pickupLocationId(1)
-                .dropOffLocationId(2)
-                .pickupDateTime(new java.util.Date(1767184800000L))
-                .returnDateTime(new java.util.Date(1767357600000L))
-                .totalPrice(189.50)
-                .status("confirmed")
+        Payment payment = Payment.builder()
+                .bookingId(44)
+                .amount(259.99)
+                .paymentStatus("paid")
+                .transactionRef("TXN-001")
                 .build();
 
-        boolean saved = dao.addBookings(booking);
+        boolean saved = dao.addPayment(payment);
 
         assertTrue(saved);
-        assertTrue(jdbc.lastSql.contains("INSERT INTO bookings"));
-        assertTrue(jdbc.lastSql.contains("(driverId, userId, carId, pickupLocationId, dropOffLocationId, pickupDatetime, returnDatetime, status, totalPrice)"));
-        assertTrue(jdbc.lastSql.contains("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"));
-        assertEquals(3, jdbc.lastParameters.get(1));
-        assertEquals(7, jdbc.lastParameters.get(2));
-        assertEquals(11, jdbc.lastParameters.get(3));
-        assertEquals(1, jdbc.lastParameters.get(4));
-        assertEquals(2, jdbc.lastParameters.get(5));
-        assertEquals(Timestamp.class, jdbc.lastParameters.get(6).getClass());
-        assertEquals(Timestamp.class, jdbc.lastParameters.get(7).getClass());
-        assertEquals("confirmed", jdbc.lastParameters.get(8));
-        assertEquals(189.50, (Double) jdbc.lastParameters.get(9));
+        assertTrue(jdbc.lastSql.contains("INSERT INTO payment"));
+        assertEquals(44, jdbc.lastParameters.get(1));
+        assertEquals(259.99, (Double) jdbc.lastParameters.get(2));
+        assertEquals("paid", jdbc.lastParameters.get(3));
+        assertEquals("TXN-001", jdbc.lastParameters.get(4));
     }
 
     @Test
-    void getBookingsByUserIdReturnsOnlyMatchingRow() throws Exception {
+    void getPaymentByBookingIdReturnsMappedPayment() throws Exception {
         FakeJdbc jdbc = new FakeJdbc();
         Map<String, Object> row = new HashMap<>();
-        row.put("bookingId", 42);
-        row.put("driverId", 3);
-        row.put("userId", 7);
-        row.put("carId", 11);
-        row.put("pickupLocationId", 1);
-        row.put("dropOffLocationId", 2);
-        row.put("pickupDatetime", Timestamp.valueOf("2026-05-01 10:00:00"));
-        row.put("returnDatetime", Timestamp.valueOf("2026-05-03 10:00:00"));
-        row.put("totalPrice", 210.00);
-        row.put("status", "confirmed");
+        row.put("paymentId", 8);
+        row.put("bookingId", 44);
+        row.put("paymentDate", Timestamp.valueOf("2026-05-03 11:15:00"));
+        row.put("amount", 259.99);
+        row.put("paymentStatus", "paid");
+        row.put("transactionRef", "TXN-001");
         jdbc.queryRows.add(row);
 
-        BookingDaoImpl dao = new BookingDaoImpl(jdbc.connector());
-        List<Bookings> bookings = dao.getBookingsByUserId(7);
+        PaymentDaoImpl dao = new PaymentDaoImpl(jdbc.connector());
+        Payment payment = dao.getPaymentByBookingId(44);
 
-        assertNotNull(bookings);
-        assertEquals(1, bookings.size());
-        assertEquals(42, bookings.get(0).getBookingId());
-        assertEquals(7, bookings.get(0).getUserId());
-        assertEquals(3, bookings.get(0).getDriverId());
-    }
-
-    @Test
-    void getAllBookingsReturnsAllRows() throws Exception {
-        FakeJdbc jdbc = new FakeJdbc();
-
-        Map<String, Object> first = new HashMap<>();
-        first.put("bookingId", 10);
-        first.put("driverId", 4);
-        first.put("userId", 8);
-        first.put("carId", 12);
-        first.put("pickupLocationId", 1);
-        first.put("dropOffLocationId", 2);
-        first.put("pickupDatetime", Timestamp.valueOf("2026-05-01 09:00:00"));
-        first.put("returnDatetime", Timestamp.valueOf("2026-05-02 09:00:00"));
-        first.put("totalPrice", 120.00);
-        first.put("status", "confirmed");
-
-        Map<String, Object> second = new HashMap<>();
-        second.put("bookingId", 11);
-        second.put("driverId", null);
-        second.put("userId", 9);
-        second.put("carId", 13);
-        second.put("pickupLocationId", 1);
-        second.put("dropOffLocationId", 2);
-        second.put("pickupDatetime", Timestamp.valueOf("2026-05-03 09:00:00"));
-        second.put("returnDatetime", Timestamp.valueOf("2026-05-04 09:00:00"));
-        second.put("totalPrice", 140.00);
-        second.put("status", "confirmed");
-
-        jdbc.queryRows.add(first);
-        jdbc.queryRows.add(second);
-
-        BookingDaoImpl dao = new BookingDaoImpl(jdbc.connector());
-        List<Bookings> bookings = dao.getAllBookings();
-
-        assertNotNull(bookings);
-        assertEquals(2, bookings.size());
-        assertEquals(10, bookings.get(0).getBookingId());
-        assertEquals(11, bookings.get(1).getBookingId());
-        assertEquals(4, bookings.get(0).getDriverId());
-        assertEquals(null, bookings.get(1).getDriverId());
-    }
-
-    @Test
-    void addBookingsAllowsNullDriver() throws Exception {
-        FakeJdbc jdbc = new FakeJdbc();
-        BookingDaoImpl dao = new BookingDaoImpl(jdbc.connector());
-
-        Bookings booking = Bookings.builder()
-                .driverId(null)
-                .userId(7)
-                .carId(11)
-                .pickupLocationId(1)
-                .dropOffLocationId(2)
-                .pickupDateTime(new java.util.Date(1767184800000L))
-                .returnDateTime(new java.util.Date(1767357600000L))
-                .totalPrice(189.50)
-                .status("confirmed")
-                .build();
-
-        boolean saved = dao.addBookings(booking);
-
-        assertTrue(saved);
-        assertEquals(java.sql.Types.INTEGER, jdbc.lastParameters.get(1));
-        assertEquals(7, jdbc.lastParameters.get(2));
-        assertEquals(11, jdbc.lastParameters.get(3));
+        assertNotNull(payment);
+        assertEquals(8, payment.getPaymentId());
+        assertEquals(44, payment.getBookingId());
+        assertEquals(259.99, payment.getAmount());
+        assertEquals("paid", payment.getPaymentStatus());
+        assertEquals("TXN-001", payment.getTransactionRef());
     }
 
     private static final class FakeJdbc {
@@ -222,8 +139,8 @@ class BookingDaoImplTest {
         private PreparedStatement createPreparedStatement() {
             InvocationHandler handler = (proxy, method, args) -> {
                 String name = method.getName();
-                if ("setInt".equals(name) || "setDouble".equals(name) || "setString".equals(name) || "setTimestamp".equals(name) || "setNull".equals(name)) {
-                    lastParameters.put((Integer) args[0], args.length > 1 ? args[1] : null);
+                if ("setInt".equals(name) || "setDouble".equals(name) || "setString".equals(name)) {
+                    lastParameters.put((Integer) args[0], args[1]);
                     return null;
                 }
                 if ("executeUpdate".equals(name)) {
