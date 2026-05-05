@@ -5,38 +5,362 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Booking Details - CarRentalServices</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/site.css}">
     <style>
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-            url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            background:
+                linear-gradient(180deg, rgba(6, 17, 31, 0.95) 0%, rgba(6, 17, 31, 0.76) 44%, rgba(244, 247, 251, 0.95) 44%, rgba(244, 247, 251, 1) 100%),
+                url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
+            background-attachment: fixed;
         }
+
         .content-wrapper { flex: 1 0 auto; }
-        .navbar { background-color: rgba(33, 37, 41, 0.9) !important; }
-        .page-panel {
-            background: rgba(255, 255, 255, 0.96);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+
+        .navbar { background-color: rgba(6, 17, 31, 0.96) !important; }
+
+        .page-hero {
+            position: relative;
+            overflow: hidden;
+            padding: 4.5rem 0 4rem;
+            color: #fff;
         }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(6, 17, 31, 0.94), rgba(15, 118, 110, 0.56));
+            pointer-events: none;
+        }
+
+        .page-hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 999px;
+            padding: 0.45rem 0.8rem;
+            background: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .page-hero h1 {
+            font-size: clamp(2.15rem, 3vw, 3.35rem);
+            line-height: 1.05;
+        }
+
+        .page-hero .lead {
+            max-width: 44rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .details-shell {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(215, 225, 238, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 18px 45px rgba(10, 18, 30, 0.12);
+            overflow: hidden;
+        }
+
+        .details-top {
+            position: relative;
+            padding: 1.5rem 1.5rem 1.25rem;
+            background: linear-gradient(135deg, rgba(6, 17, 31, 0.98), rgba(15, 39, 66, 0.96));
+            color: #fff;
+        }
+
+        .details-top::after {
+            content: "";
+            position: absolute;
+            inset: auto 0 0 0;
+            height: 6px;
+            background: linear-gradient(90deg, #0f766e, #f59e0b, #0f766e);
+        }
+
+        .details-top__eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            border-radius: 999px;
+            padding: 0.4rem 0.75rem;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.88);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .details-top h2 {
+            margin: 1rem 0 0.35rem;
+            font-size: 1.45rem;
+            font-weight: 800;
+        }
+
+        .details-top p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.78);
+        }
+
+        .details-panel {
+            padding: 1.5rem;
+        }
+
+        .info-card {
+            height: 100%;
+            border-radius: 8px;
+            border: 1px solid rgba(215, 225, 238, 0.95);
+            background: #fff;
+            box-shadow: 0 10px 28px rgba(10, 18, 30, 0.08);
+            padding: 1.15rem;
+            transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 34px rgba(10, 18, 30, 0.12);
+            border-color: rgba(15, 118, 110, 0.28);
+        }
+
+        .info-card__title {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.9rem;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #102033;
+        }
+
+        .info-card__title i {
+            color: #0f766e;
+        }
+
+        .details-grid {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.8rem 0;
+            border-top: 1px solid rgba(215, 225, 238, 0.85);
+        }
+
+        .detail-item:first-of-type {
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .detail-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #63738a;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .detail-label i {
+            color: #173b5d;
+        }
+
+        .detail-value {
+            margin: 0;
+            color: #102033;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .payment-status-card {
+            border-radius: 8px;
+            padding: 1rem 1.1rem;
+            background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(245, 158, 11, 0.08));
+            border: 1px solid rgba(215, 225, 238, 0.95);
+        }
+
+        .payment-status-card__label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #63738a;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-status-card .badge {
+            border-radius: 999px;
+            padding: 0.55rem 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .payment-status-card .text-bg-success {
+            background-color: rgba(15, 118, 110, 0.14) !important;
+            color: #0f766e !important;
+        }
+
+        .payment-status-card .text-bg-warning {
+            background-color: rgba(245, 158, 11, 0.14) !important;
+            color: #d97706 !important;
+        }
+
+        .price-card {
+            border-radius: 8px;
+            padding: 1.15rem;
+            background: linear-gradient(135deg, rgba(13, 39, 66, 0.05), rgba(15, 118, 110, 0.05));
+            border: 1px solid rgba(215, 225, 238, 0.95);
+        }
+
+        .price-card__label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #63738a;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .price-card__value {
+            font-size: clamp(2rem, 3vw, 2.8rem);
+            font-weight: 900;
+            color: #0f766e;
+            line-height: 1.05;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .btn-modern {
+            min-height: 48px;
+            padding-inline: 1rem;
+            font-weight: 700;
+            transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #173b5d, #0d2742);
+            border: 0;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #12365a, #0a1f35);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #0f766e, #0e9185);
+            border: 0;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #0d655d, #0a7d73);
+        }
+
+        .btn-outline-success {
+            border-color: rgba(15, 118, 110, 0.35);
+            color: #0f766e;
+        }
+
+        .btn-outline-success:hover {
+            background: rgba(15, 118, 110, 0.08);
+            color: #0f766e;
+        }
+
+        .btn-outline-secondary {
+            border-color: rgba(96, 112, 134, 0.38);
+        }
+
+        .btn-outline-secondary:hover {
+            background: #f8fbff;
+            color: #102033;
+        }
+
         .footer-board {
-            background-color: rgba(33, 37, 41, 0.95);
-            color: white;
+            background-color: rgba(6, 17, 31, 0.98);
+            color: rgba(255, 255, 255, 0.82);
             padding: 20px 0;
             flex-shrink: 0;
         }
+
         .social-link {
-            color: #E1306C;
+            color: #f59e0b;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 700;
         }
-        .social-link:hover { color: #ff5e9a; text-decoration: underline; }
+
+        .social-link:hover {
+            color: #ffb03a;
+            text-decoration: underline;
+        }
+
+        .view-payment-card {
+            border-radius: 8px;
+            padding: 1rem;
+            background: #fff;
+            border: 1px solid rgba(215, 225, 238, 0.95);
+            box-shadow: 0 10px 28px rgba(10, 18, 30, 0.08);
+        }
+
+        @media (max-width: 767.98px) {
+            .page-hero {
+                padding: 3.5rem 0 3rem;
+            }
+
+            .details-panel,
+            .details-top,
+            .info-card,
+            .price-card {
+                padding: 1rem;
+            }
+
+            .detail-item {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .detail-value {
+                text-align: left;
+            }
+
+            .action-row {
+                flex-direction: column;
+            }
+
+            .btn-modern {
+                width: 100%;
+            }
+        }
     </style>
-    <link rel="stylesheet" th:href="@{/css/site.css}">
 </head>
 <body class="vanta-page">
 <div class="content-wrapper">
@@ -61,59 +385,187 @@
         </div>
     </nav>
 
-    <main class="container my-5">
-        <div class="page-panel p-4">
-            <h1 class="h3 mb-4">Booking Details</h1>
-
-            <div class="alert alert-success" th:if="${payment != null}">
-                This booking has already been paid.
-                <span class="fw-bold">Payment token:</span>
-                <span th:text="${payment.transactionRef}">SIM-REF</span>
+    <header class="page-hero">
+        <div class="container">
+            <div class="row align-items-end g-4">
+                <div class="col-lg-8">
+                    <span class="hero-eyebrow"><i class="bi bi-check-circle-fill"></i> Booking confirmed</span>
+                    <h1 class="display-5 fw-bold mt-3 mb-3">Booking Details</h1>
+                    <p class="lead mb-0">A clear summary of your booking, trip information, payment status, and next action buttons.</p>
+                </div>
             </div>
+        </div>
+    </header>
 
-            <dl class="row">
-                <dt class="col-sm-3">Booking ID</dt>
-                <dd class="col-sm-9" th:text="${booking.bookingId}">1</dd>
+    <main class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="details-shell">
+                    <div class="details-top">
+                        <span class="details-top__eyebrow"><i class="bi bi-journal-check"></i> Booking summary</span>
+                        <h2>Booking Details</h2>
+                        <p>Everything you need is grouped below for fast scanning and easy follow-up.</p>
+                    </div>
 
-                <dt class="col-sm-3">User ID</dt>
-                <dd class="col-sm-9" th:text="${booking.userId}">1</dd>
+                    <div class="details-panel">
+                        <div class="alert alert-success mb-4" th:if="${payment != null}">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-shield-check fs-5"></i>
+                                <div>
+                                    <strong>This booking has already been paid.</strong>
+                                    <div>
+                                        <span class="fw-bold">Payment token:</span>
+                                        <span th:text="${payment.transactionRef}">SIM-REF</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                <dt class="col-sm-3">Car ID</dt>
-                <dd class="col-sm-9" th:text="${booking.carId}">1</dd>
+                        <div class="row g-4 mb-4">
+                            <div class="col-lg-4">
+                                <div class="info-card h-100">
+                                    <div class="info-card__title"><i class="bi bi-receipt"></i>Booking Reference</div>
+                                    <div class="details-grid">
+                                        <div class="detail-item">
+                                            <div>
+                                                <div class="detail-label"><i class="bi bi-hash"></i>Booking ID</div>
+                                            </div>
+                                            <p class="detail-value" th:text="${booking.bookingId}">1</p>
+                                        </div>
 
-                <dt class="col-sm-3">Driver ID</dt>
-                <dd class="col-sm-9" th:text="${booking.driverId}">1</dd>
+                                        <div class="detail-item">
+                                            <div>
+                                                <div class="detail-label"><i class="bi bi-person"></i>User ID</div>
+                                            </div>
+                                            <p class="detail-value" th:text="${booking.userId}">1</p>
+                                        </div>
 
-                <dt class="col-sm-3">Pickup Location ID</dt>
-                <dd class="col-sm-9" th:text="${booking.pickupLocationId}">1</dd>
+                                        <div class="payment-status-card">
+                                            <div class="payment-status-card__label"><i class="bi bi-credit-card-2-front"></i>Payment Status</div>
+                                            <span class="badge text-bg-success" th:if="${payment != null}">Paid</span>
+                                            <span class="badge text-bg-warning" th:if="${payment == null}">Payment due</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                <dt class="col-sm-3">Drop-off Location ID</dt>
-                <dd class="col-sm-9" th:text="${booking.dropOffLocationId}">1</dd>
+                            <div class="col-lg-8">
+                                <div class="info-card h-100">
+                                    <div class="info-card__title"><i class="bi bi-car-front-fill"></i>Trip Details</div>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="detail-item">
+                                                <div>
+                                                    <div class="detail-label"><i class="bi bi-car-front"></i>Car ID</div>
+                                                </div>
+                                                <p class="detail-value" th:text="${booking.carId}">1</p>
+                                            </div>
+                                        </div>
 
-                <dt class="col-sm-3">Pickup</dt>
-                <dd class="col-sm-9" th:text="${#dates.format(booking.pickupDateTime, 'yyyy-MM-dd HH:mm')}">2026-01-01 10:00</dd>
+                                        <div class="col-md-6">
+                                            <div class="detail-item">
+                                                <div>
+                                                    <div class="detail-label"><i class="bi bi-person-vcard"></i>Driver ID</div>
+                                                </div>
+                                                <p class="detail-value" th:text="${booking.driverId}">1</p>
+                                            </div>
+                                        </div>
 
-                <dt class="col-sm-3">Return</dt>
-                <dd class="col-sm-9" th:text="${#dates.format(booking.returnDateTime, 'yyyy-MM-dd HH:mm')}">2026-01-02 10:00</dd>
+                                        <div class="col-md-6">
+                                            <div class="detail-item">
+                                                <div>
+                                                    <div class="detail-label"><i class="bi bi-calendar-event"></i>Pickup</div>
+                                                </div>
+                                                <p class="detail-value" th:text="${#dates.format(booking.pickupDateTime, 'yyyy-MM-dd HH:mm')}">2026-01-01 10:00</p>
+                                            </div>
+                                        </div>
 
-                <dt class="col-sm-3">Total Price</dt>
-                <dd class="col-sm-9" th:text="${booking.totalPrice}">0.00</dd>
+                                        <div class="col-md-6">
+                                            <div class="detail-item">
+                                                <div>
+                                                    <div class="detail-label"><i class="bi bi-calendar-check"></i>Return</div>
+                                                </div>
+                                                <p class="detail-value" th:text="${#dates.format(booking.returnDateTime, 'yyyy-MM-dd HH:mm')}">2026-01-02 10:00</p>
+                                            </div>
+                                        </div>
 
-                <dt class="col-sm-3">Status</dt>
-                <dd class="col-sm-9" th:text="${booking.status}">confirmed</dd>
+                                        <div class="col-12">
+                                            <div class="price-card">
+                                                <div class="price-card__label"><i class="bi bi-currency-euro"></i>Total Price</div>
+                                                <div class="price-card__value" th:text="${booking.totalPrice}">0.00</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                <dt class="col-sm-3">Payment</dt>
-                <dd class="col-sm-9">
-                    <span class="badge text-bg-success" th:if="${payment != null}">Paid</span>
-                    <span class="badge text-bg-warning" th:if="${payment == null}">Payment due</span>
-                </dd>
-            </dl>
+                        <div class="row g-4 mb-4">
+                            <div class="col-lg-6">
+                                <div class="info-card h-100">
+                                    <div class="info-card__title"><i class="bi bi-geo-alt-fill"></i>Locations</div>
+                                    <div class="details-grid">
+                                        <div class="detail-item">
+                                            <div>
+                                                <div class="detail-label"><i class="bi bi-geo-alt"></i>Pickup Location ID</div>
+                                            </div>
+                                            <p class="detail-value" th:text="${booking.pickupLocationId}">1</p>
+                                        </div>
 
-            <div class="d-flex gap-2">
-                <a class="btn btn-outline-secondary" th:href="@{/bookings}">Back</a>
-                <a class="btn btn-success" th:if="${payment == null}" th:href="@{/payments/{id}(id=${booking.bookingId})}">Pay Now</a>
-                <a class="btn btn-outline-success" th:if="${payment != null}" th:href="@{/payments/{id}(id=${booking.bookingId})}">View Payment</a>
-                <a class="btn btn-primary" th:href="@{/bookings/edit/{id}(id=${booking.bookingId})}">Change Booking</a>
+                                        <div class="detail-item">
+                                            <div>
+                                                <div class="detail-label"><i class="bi bi-signpost-split"></i>Drop-off Location ID</div>
+                                            </div>
+                                            <p class="detail-value" th:text="${booking.dropOffLocationId}">1</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="info-card h-100">
+                                    <div class="info-card__title"><i class="bi bi-shield-check"></i>Booking Status</div>
+                                    <div class="details-grid">
+                                        <div class="detail-item">
+                                            <div>
+                                                <div class="detail-label"><i class="bi bi-info-circle"></i>Status</div>
+                                            </div>
+                                            <p class="detail-value" th:text="${booking.status}">confirmed</p>
+                                        </div>
+
+                                        <div class="payment-status-card">
+                                            <div class="payment-status-card__label"><i class="bi bi-wallet2"></i>Payment</div>
+                                            <span class="badge text-bg-success" th:if="${payment != null}">Paid</span>
+                                            <span class="badge text-bg-warning" th:if="${payment == null}">Payment due</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="view-payment-card mb-4">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                                <div>
+                                    <div class="detail-label mb-2"><i class="bi bi-arrow-repeat"></i>Payment Summary</div>
+                                    <p class="mb-0 text-muted">Open the payment page to review payment records or complete payment if needed.</p>
+                                </div>
+                                <div class="action-row">
+                                    <a class="btn btn-outline-secondary btn-modern" th:href="@{/bookings}">Back</a>
+                                    <a class="btn btn-success btn-modern" th:if="${payment == null}" th:href="@{/payments/{id}(id=${booking.bookingId})}">Pay Now</a>
+                                    <a class="btn btn-outline-success btn-modern" th:if="${payment != null}" th:href="@{/payments/{id}(id=${booking.bookingId})}">View Payment</a>
+                                    <a class="btn btn-primary btn-modern" th:href="@{/bookings/edit/{id}(id=${booking.bookingId})}">Change Booking</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-row">
+                            <a class="btn btn-outline-secondary btn-modern" th:href="@{/bookings}">Back</a>
+                            <a class="btn btn-success btn-modern" th:if="${payment == null}" th:href="@{/payments/{id}(id=${booking.bookingId})}">Pay Now</a>
+                            <a class="btn btn-outline-success btn-modern" th:if="${payment != null}" th:href="@{/payments/{id}(id=${booking.bookingId})}">View Payment</a>
+                            <a class="btn btn-primary btn-modern" th:href="@{/bookings/edit/{id}(id=${booking.bookingId})}">Change Booking</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>

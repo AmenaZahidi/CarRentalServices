@@ -5,42 +5,253 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${pageTitle != null ? pageTitle : 'Booking'}">Booking</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/site.css}">
     <style>
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-            url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            background:
+                linear-gradient(180deg, rgba(6, 17, 31, 0.95) 0%, rgba(6, 17, 31, 0.76) 44%, rgba(244, 247, 251, 0.95) 44%, rgba(244, 247, 251, 1) 100%),
+                url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
+            background-attachment: fixed;
         }
+
         .content-wrapper { flex: 1 0 auto; }
-        .navbar { background-color: rgba(33, 37, 41, 0.9) !important; }
-        .booking-card { background: rgba(255, 255, 255, 0.96); border-radius: 15px; padding: 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-        .btn-book { background: #ff5a1f; border: none; color: white; font-weight: 700; }
-        .btn-book:hover { background: #e04910; color: white; }
-        .price-preview {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 12px;
+
+        .navbar { background-color: rgba(6, 17, 31, 0.96) !important; }
+
+        .page-hero {
+            position: relative;
+            overflow: hidden;
+            padding: 4.5rem 0 4rem;
+            color: #fff;
         }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(6, 17, 31, 0.94), rgba(15, 118, 110, 0.56));
+            pointer-events: none;
+        }
+
+        .page-hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 999px;
+            padding: 0.45rem 0.8rem;
+            background: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .page-hero h1 {
+            font-size: clamp(2.15rem, 3vw, 3.35rem);
+            line-height: 1.05;
+        }
+
+        .page-hero .lead {
+            max-width: 44rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .booking-shell {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(215, 225, 238, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 18px 45px rgba(10, 18, 30, 0.12);
+            overflow: hidden;
+        }
+
+        .booking-sidebar {
+            background: linear-gradient(180deg, rgba(6, 17, 31, 0.98), rgba(15, 39, 66, 0.96));
+            color: #fff;
+            padding: 1.5rem;
+            height: 100%;
+        }
+
+        .booking-sidebar__eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            border-radius: 999px;
+            padding: 0.4rem 0.75rem;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.86);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .booking-sidebar__title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1.15;
+            margin: 1rem 0 0.75rem;
+        }
+
+        .booking-sidebar__text {
+            color: rgba(255, 255, 255, 0.78);
+            margin-bottom: 1.25rem;
+        }
+
+        .booking-step {
+            border-radius: 8px;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 0.85rem;
+        }
+
+        .booking-step__label {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin-bottom: 0.35rem;
+            font-weight: 700;
+        }
+
+        .booking-step__text {
+            color: rgba(255, 255, 255, 0.74);
+            margin: 0;
+            font-size: 0.92rem;
+        }
+
+        .booking-panel {
+            padding: 1.5rem;
+        }
+
+        .section-card {
+            border-radius: 8px;
+            border: 1px solid rgba(215, 225, 238, 0.95);
+            background: #fff;
+            box-shadow: 0 10px 28px rgba(10, 18, 30, 0.08);
+            padding: 1.25rem;
+            height: 100%;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1.1rem;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #102033;
+        }
+
+        .section-title i {
+            color: #0f766e;
+        }
+
+        .form-label {
+            font-weight: 700;
+            color: #102033;
+            margin-bottom: 0.45rem;
+        }
+
+        .form-label i {
+            color: #173b5d;
+            margin-right: 0.4rem;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 46px;
+            border-radius: 8px;
+            border-color: #d7e1ee;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: rgba(15, 118, 110, 0.55);
+            box-shadow: 0 0 0 0.25rem rgba(15, 118, 110, 0.12);
+        }
+
+        .field-help {
+            color: #63738a;
+            font-size: 0.85rem;
+            margin-top: 0.35rem;
+        }
+
+        .price-preview {
+            background: linear-gradient(135deg, rgba(13, 39, 66, 0.05), rgba(15, 118, 110, 0.05));
+            border: 1px solid rgba(215, 225, 238, 0.95);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .price-preview__label {
+            color: #63738a;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .price-preview__value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #102033;
+        }
+
+        .btn-book {
+            background: linear-gradient(135deg, #0f766e, #0e9185);
+            border: 0;
+            color: #fff;
+            font-weight: 700;
+            min-height: 48px;
+            box-shadow: 0 14px 30px rgba(15, 118, 110, 0.22);
+        }
+
+        .btn-book:hover {
+            color: #fff;
+            background: linear-gradient(135deg, #0d655d, #0a7d73);
+        }
+
         .footer-board {
-            background-color: rgba(33, 37, 41, 0.95);
-            color: white;
+            background-color: rgba(6, 17, 31, 0.98);
+            color: rgba(255, 255, 255, 0.82);
             padding: 20px 0;
             flex-shrink: 0;
         }
+
         .social-link {
-            color: #E1306C;
+            color: #f59e0b;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 700;
         }
-        .social-link:hover { color: #ff5e9a; text-decoration: underline; }
+
+        .social-link:hover {
+            color: #ffb03a;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 767.98px) {
+            .page-hero {
+                padding: 3.5rem 0 3rem;
+            }
+
+            .booking-panel,
+            .booking-sidebar,
+            .section-card {
+                padding: 1rem;
+            }
+        }
     </style>
-    <link rel="stylesheet" th:href="@{/css/site.css}">
 </head>
 <body class="vanta-page">
 
@@ -66,111 +277,190 @@
         </div>
     </nav>
 
+    <header class="page-hero">
+        <div class="container">
+            <div class="row align-items-end g-4">
+                <div class="col-lg-8">
+                    <span class="hero-eyebrow"><i class="bi bi-journal-check"></i> Booking form</span>
+                    <h1 class="display-5 fw-bold mt-3 mb-3" th:text="${pageTitle != null ? pageTitle : 'Booking'}">Booking</h1>
+                    <p class="lead mb-0">A clean step-by-step booking form for customer details, car selection, trip dates, and price review.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
     <main class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="booking-card">
-                    <h2 class="fw-bold mb-4" th:text="${pageTitle != null ? pageTitle : 'Booking'}">Booking</h2>
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-10">
+                <div class="booking-shell">
+                    <div class="row g-0">
+                        <div class="col-lg-4">
+                            <aside class="booking-sidebar">
+                                <span class="booking-sidebar__eyebrow"><i class="bi bi-list-check"></i> Booking steps</span>
+                                <div class="booking-sidebar__title">Keep the trip details organized from start to finish.</div>
+                                <p class="booking-sidebar__text">Use the steps below to select your vehicle, define your route, and confirm the total price.</p>
 
-                    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
-
-                    <form th:action="@{${formAction}}" th:object="${booking}" method="post">
-                        <input type="hidden" th:field="*{bookingId}">
-                        <input type="hidden" th:field="*{userId}">
-                        <input th:if="${!isEditMode}" type="hidden" name="status" value="confirmed">
-                        <input th:if="${isEditMode}" type="hidden" th:field="*{status}">
-                        <input id="carDailyRate" type="hidden" th:value="${selectedCarRate}">
-                        <input id="totalPrice" type="hidden" th:field="*{totalPrice}">
-
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <label class="form-label">Customer</label>
-                                <input type="text" class="form-control" th:value="${username != null ? username : 'Logged-in customer'}" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Car</label>
-                                <select class="form-select" th:field="*{carId}" required>
-                                    <option value="">Select a car</option>
-                                    <option th:each="car : ${cars}"
-                                            th:value="${car.id}"
-                                            th:attr="data-rate=${car.dailyRate},data-transmission=${car.transmission}"
-                                            th:text="${car.label}">Toyota Corolla</option>
-                                </select>
-                                <div class="text-danger small" th:if="${#fields.hasErrors('carId')}" th:errors="*{carId}"></div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label">Driver</label>
-                                <div th:if="${!isEditMode}">
-                                    <div th:if="${driver != null}">
-                                        <input type="text" class="form-control" th:value="${driver.name}" readonly>
-                                        <input type="hidden" th:field="*{driverId}" th:value="${driver.driverId}">
-                                        <div class="form-text">Only your driver is shown here.</div>
-                                    </div>
-                                    <div th:if="${driver == null}">
-                                        <p class="mb-2 text-muted">Please upload your licence before booking</p>
-                                        <a class="btn btn-outline-primary btn-sm" th:href="@{/drivers/licence-proof}">Upload Licence</a>
-                                    </div>
+                                <div class="booking-step">
+                                    <div class="booking-step__label"><i class="bi bi-person-badge"></i>Customer & car</div>
+                                    <p class="booking-step__text">Confirm the customer profile and choose a vehicle from the fleet.</p>
                                 </div>
-                                <div th:if="${isEditMode}">
-                                    <input type="text" class="form-control" th:value="${selectedDriverLabel != null ? selectedDriverLabel : 'Not assigned'}" readonly>
-                                    <input type="hidden" th:field="*{driverId}">
-                                    <div class="form-text">The assigned driver cannot be changed here.</div>
+
+                                <div class="booking-step">
+                                    <div class="booking-step__label"><i class="bi bi-geo-alt-fill"></i>Locations</div>
+                                    <p class="booking-step__text">Select the pickup and drop-off branch.</p>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Pickup Location</label>
-                                <select class="form-select" th:field="*{pickupLocationId}" required>
-                                    <option value="">Select a pickup location</option>
-                                    <option th:each="location : ${locations}"
-                                            th:value="${location.id}"
-                                            th:text="${location.label}">Dublin Central</option>
-                                </select>
-                                <div class="text-danger small" th:if="${#fields.hasErrors('pickupLocationId')}" th:errors="*{pickupLocationId}"></div>
-                            </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label">Drop-off Location</label>
-                                <select class="form-select" th:field="*{dropOffLocationId}" required>
-                                    <option value="">Select a drop-off location</option>
-                                    <option th:each="location : ${locations}"
-                                            th:value="${location.id}"
-                                            th:text="${location.label}">Dublin Central</option>
-                                </select>
-                                <div class="text-danger small" th:if="${#fields.hasErrors('dropOffLocationId')}" th:errors="*{dropOffLocationId}"></div>
-                            </div>
-                            <div class="col-md-6"></div>
+                                <div class="booking-step">
+                                    <div class="booking-step__label"><i class="bi bi-calendar2-week"></i>Date & time</div>
+                                    <p class="booking-step__text">Set the pickup and return schedule.</p>
+                                </div>
 
-                            <div class="col-12">
-                                <label class="form-label">Pickup Date &amp; Time</label>
-                                <input type="datetime-local" class="form-control" th:field="*{pickupDateTime}" required>
-                                <div class="text-danger small" th:if="${#fields.hasErrors('pickupDateTime')}" th:errors="*{pickupDateTime}"></div>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label">Return Date &amp; Time</label>
-                                <input type="datetime-local" class="form-control" th:field="*{returnDateTime}" required>
-                                <div class="text-danger small" th:if="${#fields.hasErrors('returnDateTime')}" th:errors="*{returnDateTime}"></div>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label">Total Price</label>
-                                <input id="totalPriceDisplay" type="text" class="form-control bg-light" value="Calculated automatically" readonly>
-                                <div id="priceHelp" class="form-text">Select a car and dates to calculate the total.</div>
-                                <div class="text-danger small" th:if="${#fields.hasErrors('totalPrice')}" th:errors="*{totalPrice}"></div>
-                            </div>
-
-                            <div class="col-12 d-none">
-                                <label class="form-label">Status</label>
-                                <input type="text" class="form-control" th:value="${booking.status != null ? booking.status : 'confirmed'}" readonly>
-                            </div>
+                                <div class="booking-step mb-0">
+                                    <div class="booking-step__label"><i class="bi bi-cash-coin"></i>Price</div>
+                                    <p class="booking-step__text">Review the total before saving the booking.</p>
+                                </div>
+                            </aside>
                         </div>
 
-                        <div class="d-flex gap-2 mt-4">
-                            <button type="submit" class="btn btn-book px-4" th:text="${isEditMode ? 'Update Booking' : 'Save Booking'}">Save Booking</button>
-                            <a class="btn btn-outline-secondary" th:href="@{/bookings}">Cancel</a>
+                        <div class="col-lg-8">
+                            <div class="booking-panel">
+                                <h2 class="h4 fw-bold mb-2" th:text="${pageTitle != null ? pageTitle : 'Booking'}">Booking</h2>
+                                <p class="text-muted mb-4">All fields stay bound exactly as before.</p>
+
+                                <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+                                <form th:action="@{${formAction}}" th:object="${booking}" method="post">
+                                    <input type="hidden" th:field="*{bookingId}">
+                                    <input type="hidden" th:field="*{userId}">
+                                    <input th:if="${!isEditMode}" type="hidden" name="status" value="confirmed">
+                                    <input th:if="${isEditMode}" type="hidden" th:field="*{status}">
+                                    <input id="carDailyRate" type="hidden" th:value="${selectedCarRate}">
+                                    <input id="totalPrice" type="hidden" th:field="*{totalPrice}">
+
+                                    <div class="row g-4">
+                                        <div class="col-12">
+                                            <div class="section-card">
+                                                <div class="section-title"><i class="bi bi-person-badge"></i>Customer & Car</div>
+                                                <div class="row g-4">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label"><i class="bi bi-person-fill"></i>Customer</label>
+                                                        <input type="text" class="form-control" th:value="${username != null ? username : 'Logged-in customer'}" readonly>
+                                                        <div class="field-help">The current logged-in customer is shown here.</div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label"><i class="bi bi-car-front-fill"></i>Car</label>
+                                                        <select class="form-select" th:field="*{carId}" required>
+                                                            <option value="">Select a car</option>
+                                                            <option th:each="car : ${cars}"
+                                                                    th:value="${car.id}"
+                                                                    th:attr="data-rate=${car.dailyRate},data-transmission=${car.transmission}"
+                                                                    th:text="${car.label}">Toyota Corolla</option>
+                                                        </select>
+                                                        <div class="field-help">Choose a vehicle to calculate the trip price.</div>
+                                                        <div class="text-danger small" th:if="${#fields.hasErrors('carId')}" th:errors="*{carId}"></div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label"><i class="bi bi-person-vcard"></i>Driver</label>
+                                                        <div th:if="${!isEditMode}">
+                                                            <div th:if="${driver != null}">
+                                                                <input type="text" class="form-control" th:value="${driver.name}" readonly>
+                                                                <input type="hidden" th:field="*{driverId}" th:value="${driver.driverId}">
+                                                                <div class="field-help">Only your assigned driver is shown here.</div>
+                                                            </div>
+                                                            <div th:if="${driver == null}">
+                                                                <p class="mb-2 text-muted">Please upload your licence before booking.</p>
+                                                                <a class="btn btn-outline-primary btn-sm" th:href="@{/drivers/licence-proof}">Upload Licence</a>
+                                                            </div>
+                                                        </div>
+                                                        <div th:if="${isEditMode}">
+                                                            <input type="text" class="form-control" th:value="${selectedDriverLabel != null ? selectedDriverLabel : 'Not assigned'}" readonly>
+                                                            <input type="hidden" th:field="*{driverId}">
+                                                            <div class="field-help">The assigned driver cannot be changed here.</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="section-card">
+                                                <div class="section-title"><i class="bi bi-geo-alt-fill"></i>Locations</div>
+                                                <div class="row g-4">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label"><i class="bi bi-map"></i>Pickup Location</label>
+                                                        <select class="form-select" th:field="*{pickupLocationId}" required>
+                                                            <option value="">Select a pickup location</option>
+                                                            <option th:each="location : ${locations}"
+                                                                    th:value="${location.id}"
+                                                                    th:text="${location.label}">Dublin Central</option>
+                                                        </select>
+                                                        <div class="field-help">Choose the branch where the car will be collected.</div>
+                                                        <div class="text-danger small" th:if="${#fields.hasErrors('pickupLocationId')}" th:errors="*{pickupLocationId}"></div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label"><i class="bi bi-geo"></i>Drop-off Location</label>
+                                                        <select class="form-select" th:field="*{dropOffLocationId}" required>
+                                                            <option value="">Select a drop-off location</option>
+                                                            <option th:each="location : ${locations}"
+                                                                    th:value="${location.id}"
+                                                                    th:text="${location.label}">Dublin Central</option>
+                                                        </select>
+                                                        <div class="field-help">Choose where the vehicle will be returned.</div>
+                                                        <div class="text-danger small" th:if="${#fields.hasErrors('dropOffLocationId')}" th:errors="*{dropOffLocationId}"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="section-card">
+                                                <div class="section-title"><i class="bi bi-calendar2-week"></i>Date & Time</div>
+                                                <div class="row g-4">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label"><i class="bi bi-calendar-event"></i>Pickup Date &amp; Time</label>
+                                                        <input type="datetime-local" class="form-control" th:field="*{pickupDateTime}" required>
+                                                        <div class="field-help">Pick the start time for the rental.</div>
+                                                        <div class="text-danger small" th:if="${#fields.hasErrors('pickupDateTime')}" th:errors="*{pickupDateTime}"></div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label"><i class="bi bi-calendar-check"></i>Return Date &amp; Time</label>
+                                                        <input type="datetime-local" class="form-control" th:field="*{returnDateTime}" required>
+                                                        <div class="field-help">Choose a return time after pickup.</div>
+                                                        <div class="text-danger small" th:if="${#fields.hasErrors('returnDateTime')}" th:errors="*{returnDateTime}"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="section-card">
+                                                <div class="section-title"><i class="bi bi-cash-coin"></i>Price</div>
+                                                <div class="price-preview mb-3">
+                                                    <div class="price-preview__label">Total Price</div>
+                                                    <input id="totalPriceDisplay" type="text" class="form-control bg-light" value="Calculated automatically" readonly>
+                                                    <div id="priceHelp" class="field-help mb-0">Select a car and dates to calculate the total.</div>
+                                                </div>
+                                                <div class="text-danger small" th:if="${#fields.hasErrors('totalPrice')}" th:errors="*{totalPrice}"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 d-none">
+                                            <label class="form-label">Status</label>
+                                            <input type="text" class="form-control" th:value="${booking.status != null ? booking.status : 'confirmed'}" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-wrap gap-2 mt-4">
+                                        <button type="submit" class="btn btn-book px-4" th:text="${isEditMode ? 'Update Booking' : 'Save Booking'}">Save Booking</button>
+                                        <a class="btn btn-outline-secondary" th:href="@{/bookings}">Cancel</a>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

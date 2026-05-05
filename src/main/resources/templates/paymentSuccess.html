@@ -5,38 +5,349 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Payment Successful - CarRentalServices</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/site.css}">
     <style>
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-            url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2000&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            background:
+                radial-gradient(circle at top left, rgba(15, 118, 110, 0.10), transparent 22%),
+                radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), transparent 20%),
+                linear-gradient(180deg, rgba(6, 17, 31, 0.95) 0%, rgba(6, 17, 31, 0.76) 44%, rgba(244, 247, 251, 0.95) 44%, rgba(244, 247, 251, 1) 100%),
+                url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
+            background-attachment: fixed;
         }
+
         .content-wrapper { flex: 1 0 auto; }
-        .navbar { background-color: rgba(33, 37, 41, 0.9) !important; }
-        .page-panel {
-            background: rgba(255, 255, 255, 0.96);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+
+        .navbar { background-color: rgba(6, 17, 31, 0.96) !important; }
+
+        .page-hero {
+            position: relative;
+            overflow: hidden;
+            padding: 4.5rem 0 4rem;
+            color: #fff;
         }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(6, 17, 31, 0.94), rgba(15, 118, 110, 0.56));
+            pointer-events: none;
+        }
+
+        .page-hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 999px;
+            padding: 0.45rem 0.8rem;
+            background: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .page-hero h1 {
+            font-size: clamp(2.2rem, 3vw, 3.5rem);
+            line-height: 1.05;
+        }
+
+        .page-hero .lead {
+            max-width: 46rem;
+            color: rgba(255, 255, 255, 0.84);
+        }
+
+        .success-shell {
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(215, 225, 238, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 18px 45px rgba(10, 18, 30, 0.12);
+        }
+
+        .success-shell::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto auto 0;
+            width: 100%;
+            height: 7px;
+            background: linear-gradient(90deg, #0f766e, #f59e0b, #0f766e);
+            opacity: 0.9;
+        }
+
+        .success-header {
+            padding: 1.75rem 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .success-badge {
+            width: 92px;
+            height: 92px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(circle, rgba(15, 118, 110, 0.18), rgba(15, 118, 110, 0.08));
+            box-shadow: 0 0 0 0 rgba(15, 118, 110, 0.18);
+            animation: pulseGlow 2.8s ease-in-out infinite;
+        }
+
+        .success-badge i {
+            font-size: 3rem;
+            color: #0f766e;
+            animation: checkPop 700ms ease-out;
+        }
+
+        .success-title {
+            font-size: clamp(2rem, 2.6vw, 2.7rem);
+            font-weight: 900;
+            line-height: 1.05;
+            color: #102033;
+            margin-bottom: 0.35rem;
+        }
+
+        .success-subtitle {
+            color: #63738a;
+            margin-bottom: 0;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.9rem;
+        }
+
+        .detail-card {
+            border-radius: 8px;
+            padding: 0.95rem 1rem;
+            background: linear-gradient(135deg, rgba(13, 39, 66, 0.04), rgba(15, 118, 110, 0.04));
+            border: 1px solid rgba(215, 225, 238, 0.95);
+        }
+
+        .detail-label {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #63738a;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .detail-value {
+            margin: 0;
+            color: #102033;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .amount-card {
+            border-radius: 8px;
+            padding: 1.1rem 1.2rem;
+            background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(245, 158, 11, 0.08));
+            border: 1px solid rgba(215, 225, 238, 0.95);
+            box-shadow: 0 10px 28px rgba(10, 18, 30, 0.08);
+        }
+
+        .amount-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #63738a;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .amount-value {
+            font-size: clamp(2rem, 3vw, 2.8rem);
+            font-weight: 900;
+            color: #0f766e;
+            line-height: 1.05;
+        }
+
+        .next-steps {
+            background: #ffffff;
+            border: 1px solid rgba(215, 225, 238, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 10px 28px rgba(10, 18, 30, 0.08);
+            padding: 1.25rem;
+        }
+
+        .next-steps__title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #102033;
+            margin-bottom: 1rem;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 0.9rem;
+            padding: 0.9rem 0;
+            border-top: 1px solid rgba(215, 225, 238, 0.85);
+        }
+
+        .step-item:first-of-type {
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .step-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(13, 39, 66, 0.12), rgba(15, 118, 110, 0.12));
+            color: #173b5d;
+            font-size: 1.1rem;
+        }
+
+        .step-title {
+            margin: 0 0 0.2rem;
+            color: #102033;
+            font-weight: 800;
+        }
+
+        .step-text {
+            margin: 0;
+            color: #63738a;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .btn-action {
+            min-height: 48px;
+            padding-inline: 1rem;
+            font-weight: 700;
+            transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #173b5d, #0d2742);
+            border: 0;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #12365a, #0a1f35);
+        }
+
+        .btn-outline-secondary {
+            border-color: rgba(96, 112, 134, 0.38);
+        }
+
+        .btn-outline-secondary:hover {
+            background: #f8fbff;
+            color: #102033;
+        }
+
         .footer-board {
-            background-color: rgba(33, 37, 41, 0.95);
-            color: white;
+            background-color: rgba(6, 17, 31, 0.98);
+            color: rgba(255, 255, 255, 0.82);
             padding: 20px 0;
             flex-shrink: 0;
         }
+
         .social-link {
-            color: #E1306C;
+            color: #f59e0b;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 700;
         }
-        .social-link:hover { color: #ff5e9a; text-decoration: underline; }
+
+        .social-link:hover {
+            color: #ffb03a;
+            text-decoration: underline;
+        }
+
+        .confetti {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .confetti span {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            opacity: 0.45;
+            animation: confettiFloat 7s linear infinite;
+        }
+
+        .confetti span:nth-child(1) { left: 8%; top: 10%; background: #0f766e; animation-delay: 0s; }
+        .confetti span:nth-child(2) { left: 18%; top: 6%; background: #f59e0b; animation-delay: 0.8s; }
+        .confetti span:nth-child(3) { left: 28%; top: 12%; background: #173b5d; animation-delay: 1.4s; }
+        .confetti span:nth-child(4) { left: 68%; top: 8%; background: #0f766e; animation-delay: 0.3s; }
+        .confetti span:nth-child(5) { left: 78%; top: 14%; background: #f59e0b; animation-delay: 1.1s; }
+        .confetti span:nth-child(6) { left: 88%; top: 9%; background: #173b5d; animation-delay: 1.8s; }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(15, 118, 110, 0.18); }
+            50% { transform: scale(1.03); box-shadow: 0 0 0 18px rgba(15, 118, 110, 0.02); }
+        }
+
+        @keyframes checkPop {
+            0% { transform: scale(0.4); opacity: 0; }
+            70% { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes confettiFloat {
+            0% { transform: translateY(-20px) rotate(0deg); }
+            100% { transform: translateY(260px) rotate(180deg); }
+        }
+
+        @media (max-width: 767.98px) {
+            .page-hero {
+                padding: 3.5rem 0 3rem;
+            }
+
+            .success-header,
+            .next-steps {
+                padding: 1rem;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-row {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                width: 100%;
+            }
+        }
     </style>
-    <link rel="stylesheet" th:href="@{/css/site.css}">
 </head>
 <body class="vanta-page">
 <div class="content-wrapper">
@@ -61,33 +372,97 @@
         </div>
     </nav>
 
+    <header class="page-hero">
+        <div class="confetti" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="container">
+            <div class="row align-items-end g-4">
+                <div class="col-lg-8">
+                    <span class="hero-eyebrow"><i class="bi bi-check-circle-fill"></i> Payment complete</span>
+                    <h1 class="display-5 fw-bold mt-3 mb-3">Payment Successful!</h1>
+                    <p class="lead mb-0">You're all set. Your simulated payment has been recorded and the booking can now move forward.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
     <main class="container my-5">
         <div class="row justify-content-center">
-            <div class="col-lg-7">
-                <div class="page-panel p-4 text-center">
-                    <h1 class="h3 mb-3">Payment Successful</h1>
-                    <p class="lead">Your simulated payment has been recorded.</p>
+            <div class="col-lg-8">
+                <div class="success-shell">
+                    <div class="success-header">
+                        <div class="success-badge">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                        <h2 class="success-title">You're all set!</h2>
+                        <p class="success-subtitle">Your payment has been successfully processed and linked to your booking.</p>
+                    </div>
 
-                    <dl class="row text-start mt-4">
-                        <dt class="col-sm-4">Booking ID</dt>
-                        <dd class="col-sm-8" th:text="${booking.bookingId}">1</dd>
+                    <div class="px-4 pb-4">
+                        <div class="amount-card mb-4 text-center">
+                            <div class="amount-label"><i class="bi bi-currency-euro"></i> Amount paid</div>
+                            <div class="amount-value" th:text="${'EUR ' + #numbers.formatDecimal(payment.amount, 1, 2)}">EUR 0.00</div>
+                        </div>
 
-                        <dt class="col-sm-4">Amount</dt>
-                        <dd class="col-sm-8" th:text="${'EUR ' + #numbers.formatDecimal(payment.amount, 1, 2)}">EUR 0.00</dd>
+                        <div class="detail-grid mb-4">
+                            <div class="detail-card">
+                                <div class="detail-label"><i class="bi bi-receipt"></i>Booking ID</div>
+                                <p class="detail-value" th:text="${booking.bookingId}">1</p>
+                            </div>
 
-                        <dt class="col-sm-4">Status</dt>
-                        <dd class="col-sm-8" th:text="${payment.paymentStatus}">paid</dd>
+                            <div class="detail-card">
+                                <div class="detail-label"><i class="bi bi-shield-check"></i>Status</div>
+                                <p class="detail-value" th:text="${payment.paymentStatus}">paid</p>
+                            </div>
 
-                        <dt class="col-sm-4">Method</dt>
-                        <dd class="col-sm-8" th:text="${paymentMethod ?: 'Debit / Credit Card'}">Debit / Credit Card</dd>
+                            <div class="detail-card">
+                                <div class="detail-label"><i class="bi bi-credit-card"></i>Method</div>
+                                <p class="detail-value" th:text="${paymentMethod ?: 'Debit / Credit Card'}">Debit / Credit Card</p>
+                            </div>
 
-                        <dt class="col-sm-4">Payment Token</dt>
-                        <dd class="col-sm-8" th:text="${payment.transactionRef}">SIM-REF</dd>
-                    </dl>
+                            <div class="detail-card">
+                                <div class="detail-label"><i class="bi bi-upc-scan"></i>Payment Token</div>
+                                <p class="detail-value text-break" th:text="${payment.transactionRef}">SIM-REF</p>
+                            </div>
+                        </div>
 
-                    <div class="d-flex gap-2 justify-content-center mt-4">
-                        <a class="btn btn-primary" th:href="@{/bookings/{id}(id=${booking.bookingId})}">View Booking</a>
-                        <a class="btn btn-outline-secondary" th:href="@{/bookings}">Back to Bookings</a>
+                        <div class="next-steps mb-4">
+                            <div class="next-steps__title">Next Steps</div>
+
+                            <div class="step-item">
+                                <div class="step-icon"><i class="bi bi-check2-all"></i></div>
+                                <div>
+                                    <p class="step-title">Booking confirmed</p>
+                                    <p class="step-text">Your reservation is now marked as paid and ready for the next stage.</p>
+                                </div>
+                            </div>
+
+                            <div class="step-item">
+                                <div class="step-icon"><i class="bi bi-journal-check"></i></div>
+                                <div>
+                                    <p class="step-title">View booking details</p>
+                                    <p class="step-text">Open the booking page to review your car, dates, and trip information.</p>
+                                </div>
+                            </div>
+
+                            <div class="step-item">
+                                <div class="step-icon"><i class="bi bi-envelope-check"></i></div>
+                                <div>
+                                    <p class="step-title">Check your email</p>
+                                    <p class="step-text">Keep an eye on your inbox for the booking confirmation summary.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-row justify-content-center">
+                            <a class="btn btn-primary btn-action" th:href="@{/bookings/{id}(id=${booking.bookingId})}">
+                                <i class="bi bi-journal-check me-2"></i>View Booking
+                            </a>
+                            <a class="btn btn-outline-secondary btn-action" th:href="@{/bookings}">
+                                <i class="bi bi-arrow-left me-2"></i>Back to Bookings
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
