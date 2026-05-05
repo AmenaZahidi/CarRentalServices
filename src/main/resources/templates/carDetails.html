@@ -75,6 +75,7 @@
         }
         .social-link:hover { color: #ff5e9a; text-decoration: underline; }
     </style>
+    <link rel="stylesheet" th:href="@{/css/site.css}">
 </head>
 <body>
 <div class="content-wrapper">
@@ -90,6 +91,7 @@
                     <a class="nav-link active" th:href="@{/carDetails}">Browse Cars</a>
                     <a class="nav-link" th:if="${loggedIn}" th:href="@{/bookings}">Manage Bookings</a>
                     <a class="nav-link" th:if="${loggedIn}" th:href="@{/locations}">Locations</a>
+                    <a class="nav-link" th:if="${loggedIn}" th:href="@{/reviews.html}">Reviews</a>
                     <a class="nav-link" th:if="${loggedIn}" th:href="@{/contact}">Contact Us</a>
                     <a class="nav-link" th:unless="${loggedIn}" th:href="@{/login}">Login</a>
                     <a class="nav-link" th:unless="${loggedIn}" th:href="@{/register}">Register</a>
@@ -105,8 +107,8 @@
         <div class="dashboard-box mb-4">
             <h4 class="border-bottom pb-2 mb-3">Sort Fleet</h4>
             <div class="d-flex gap-4">
-                <a th:href="@{/carDetails(sort='mileageDesc')}" class="text-white text-decoration-none">High Mileage</a>
-                <a th:href="@{/carDetails(sort='mileageAsc')}" class="text-white text-decoration-none">Low Mileage</a>
+                <a th:href="@{/carDetails(sort='mileageDesc')}" class="text-dark text-decoration-none">High Mileage</a>
+                <a th:href="@{/carDetails(sort='mileageAsc')}" class="text-dark text-decoration-none">Low Mileage</a>
             </div>
         </div>
 

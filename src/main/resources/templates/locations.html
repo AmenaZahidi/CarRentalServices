@@ -5,41 +5,234 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Locations - CarRentalServices</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/site.css}">
     <style>
         body {
-            background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-            url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2000&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            background:
+                linear-gradient(180deg, rgba(6, 17, 31, 0.94) 0%, rgba(6, 17, 31, 0.76) 48%, rgba(244, 247, 251, 0.94) 48%, rgba(244, 247, 251, 1) 100%),
+                url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
+            background-attachment: fixed;
         }
-        .content-wrapper { flex: 1 0 auto; }
-        .navbar { background-color: rgba(33, 37, 41, 0.9) !important; }
-        .page-panel {
-            background: rgba(255, 255, 255, 0.96);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+
+        .content-wrapper {
+            flex: 1 0 auto;
         }
-        .map-frame {
+
+        .navbar {
+            background-color: rgba(6, 17, 31, 0.96) !important;
+        }
+
+        .page-hero {
+            position: relative;
+            overflow: hidden;
+            padding: 4.5rem 0 4rem;
+            color: #fff;
+        }
+
+        .page-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(6, 17, 31, 0.92), rgba(15, 118, 110, 0.58));
+            pointer-events: none;
+        }
+
+        .page-hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 999px;
+            padding: 0.45rem 0.8rem;
+            background: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .page-hero h1 {
+            font-size: clamp(2.15rem, 3vw, 3.35rem);
+            line-height: 1.05;
+        }
+
+        .page-hero .lead {
+            max-width: 42rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .location-badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem;
+            margin-top: 1.25rem;
+        }
+
+        .location-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 999px;
+            padding: 0.55rem 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.88);
+            font-weight: 600;
+        }
+
+        .location-card {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(215, 225, 238, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 18px 45px rgba(10, 18, 30, 0.12);
+            transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        }
+
+        .location-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 22px 50px rgba(10, 18, 30, 0.16);
+            border-color: rgba(15, 118, 110, 0.28);
+        }
+
+        .location-card__header {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: start;
+            margin-bottom: 1.25rem;
+        }
+
+        .location-card__title {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #102033;
+        }
+
+        .location-card__meta {
+            color: #63738a;
+            font-size: 0.92rem;
+            margin-top: 0.35rem;
+        }
+
+        .location-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            border-radius: 999px;
+            padding: 0.45rem 0.7rem;
+            background: rgba(15, 118, 110, 0.1);
+            color: #0f766e;
+            font-size: 0.78rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .location-detail {
+            display: flex;
+            gap: 0.9rem;
+            padding: 0.9rem 0;
+            border-top: 1px solid rgba(215, 225, 238, 0.85);
+        }
+
+        .location-detail:first-of-type {
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .location-detail__icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(13, 39, 66, 0.12), rgba(15, 118, 110, 0.12));
+            color: #173b5d;
+            font-size: 1.1rem;
+        }
+
+        .location-detail__label {
+            display: block;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #63738a;
+            font-weight: 700;
+            margin-bottom: 0.15rem;
+        }
+
+        .location-detail__text {
+            margin: 0;
+            color: #102033;
+            font-weight: 600;
+        }
+
+        .location-hours {
+            color: #63738a;
+            margin-top: 0.15rem;
+        }
+
+        .directions-btn {
+            min-height: 48px;
+            background: linear-gradient(135deg, #0f766e, #0e9185);
             border: 0;
-            min-height: 450px;
-            width: 100%;
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 14px 30px rgba(15, 118, 110, 0.22);
         }
+
+        .directions-btn:hover {
+            color: #fff;
+            background: linear-gradient(135deg, #0d655d, #0a7d73);
+        }
+
         .footer-board {
-            background-color: rgba(33, 37, 41, 0.95);
-            color: white;
+            background-color: rgba(6, 17, 31, 0.98);
+            color: rgba(255, 255, 255, 0.82);
             padding: 20px 0;
             flex-shrink: 0;
         }
+
         .social-link {
-            color: #E1306C;
+            color: #f59e0b;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 700;
         }
-        .social-link:hover { color: #ff5e9a; text-decoration: underline; }
+
+        .social-link:hover {
+            color: #ffb03a;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 767.98px) {
+            .page-hero {
+                padding: 3.5rem 0 3rem;
+            }
+
+            .location-card {
+                padding: 1rem !important;
+            }
+
+            .location-card__header {
+                flex-direction: column;
+                align-items: start;
+            }
+
+            .location-detail {
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body class="vanta-page">
@@ -56,6 +249,7 @@
                     <a class="nav-link" th:href="@{/carDetails}">Browse Cars</a>
                     <a class="nav-link" th:href="@{/bookings}">Manage Bookings</a>
                     <a class="nav-link active" th:href="@{/locations}">Locations</a>
+                    <a class="nav-link" th:href="@{/reviews.html}">Reviews</a>
                     <a class="nav-link" th:href="@{/contact}">Contact Us</a>
                     <div class="ms-lg-3">
                         <a class="btn btn-outline-danger btn-sm" th:href="@{/logout}">Logout</a>
@@ -65,67 +259,113 @@
         </div>
     </nav>
 
-    <main class="container my-5">
-        <div class="text-center text-white mb-5">
-            <h1 class="display-5 fw-bold">Locations</h1>
-            <p class="lead mb-0">Visit our pickup branches or plan your route before collecting a car.</p>
+    <header class="page-hero">
+        <div class="container">
+            <div class="row align-items-end g-4">
+                <div class="col-lg-8">
+                    <span class="hero-eyebrow"><i class="bi bi-geo-alt-fill"></i> Branch locations</span>
+                    <h1 class="display-5 fw-bold mt-3 mb-3">Premium pickup points across Dublin and Dundalk.</h1>
+                    <p class="lead mb-0">Visit a branch, check opening hours, and get moving with the same booking flow you already use.</p>
+                    <div class="location-badge-row">
+                        <span class="location-pill"><i class="bi bi-shield-check"></i>Trusted branches</span>
+                        <span class="location-pill"><i class="bi bi-clock-history"></i>Convenient hours</span>
+                        <span class="location-pill"><i class="bi bi-geo-alt"></i>Easy access</span>
+                    </div>
+                </div>
+            </div>
         </div>
+    </header>
 
+    <main class="container my-5">
         <div class="row g-4">
             <div class="col-lg-6">
-                <div class="page-panel h-100 p-4">
-                    <h2 class="h4 border-bottom pb-2 mb-4">Dundalk Branch</h2>
-
-                    <div class="mb-4">
-                        <h3 class="h6">Address</h3>
-                        <p class="text-muted mb-0">Dublin Road, Dundalk</p>
-                        <p class="text-muted">Co. Louth, A91 K584</p>
+                <div class="location-card h-100 p-4">
+                    <div class="location-card__header">
+                        <div>
+                            <h2 class="location-card__title">Dundalk Branch</h2>
+                            <p class="location-card__meta mb-0">Main pickup point for north-east routes.</p>
+                        </div>
+                        <span class="location-chip"><i class="bi bi-building"></i>Branch</span>
                     </div>
 
-                    <div class="mb-4">
-                        <h3 class="h6">Phone</h3>
-                        <p class="text-muted">+353 42 937 0200</p>
+                    <div class="location-detail">
+                        <div class="location-detail__icon"><i class="bi bi-geo-alt-fill"></i></div>
+                        <div>
+                            <span class="location-detail__label">Address</span>
+                            <p class="location-detail__text">Dublin Road, Dundalk</p>
+                            <p class="text-muted mb-0">Co. Louth, A91 K584</p>
+                        </div>
                     </div>
 
-                    <div class="mb-4">
-                        <h3 class="h6">Business Hours</h3>
-                        <p class="text-muted mb-0">Mon - Fri: 9:00 AM - 6:00 PM</p>
-                        <p class="text-muted">Saturday: 10:00 AM - 4:00 PM</p>
+                    <div class="location-detail">
+                        <div class="location-detail__icon"><i class="bi bi-telephone-fill"></i></div>
+                        <div>
+                            <span class="location-detail__label">Phone</span>
+                            <p class="location-detail__text">+353 42 937 0200</p>
+                        </div>
+                    </div>
+
+                    <div class="location-detail">
+                        <div class="location-detail__icon"><i class="bi bi-clock-fill"></i></div>
+                        <div>
+                            <span class="location-detail__label">Business Hours</span>
+                            <p class="location-detail__text mb-1">Mon - Fri</p>
+                            <p class="location-hours mb-0">9:00 AM - 6:00 PM</p>
+                            <p class="location-detail__text mb-1 mt-2">Saturday</p>
+                            <p class="location-hours mb-0">10:00 AM - 4:00 PM</p>
+                        </div>
                     </div>
 
                     <a href="https://www.google.com/maps/dir//Dundalk+Institute+of+Technology"
                        target="_blank"
-                       class="btn btn-success w-100">
-                        Get Directions
+                       class="btn directions-btn w-100 mt-4">
+                        <i class="bi bi-compass me-2"></i>Get Directions
                     </a>
                 </div>
             </div>
 
             <div class="col-lg-6">
-                <div class="page-panel h-100 p-4">
-                    <h2 class="h4 border-bottom pb-2 mb-4">Dublin Central</h2>
-
-                    <div class="mb-4">
-                        <h3 class="h6">Address</h3>
-                        <p class="text-muted mb-0">12 Main Street, Dublin</p>
-                        <p class="text-muted">Co. Dublin</p>
+                <div class="location-card h-100 p-4">
+                    <div class="location-card__header">
+                        <div>
+                            <h2 class="location-card__title">Dublin Central</h2>
+                            <p class="location-card__meta mb-0">Convenient city access for urban pickup and drop-off.</p>
+                        </div>
+                        <span class="location-chip"><i class="bi bi-geo-alt"></i>City</span>
                     </div>
 
-                    <div class="mb-4">
-                        <h3 class="h6">Phone</h3>
-                        <p class="text-muted">+353 1 234 5678</p>
+                    <div class="location-detail">
+                        <div class="location-detail__icon"><i class="bi bi-geo-alt-fill"></i></div>
+                        <div>
+                            <span class="location-detail__label">Address</span>
+                            <p class="location-detail__text">12 Main Street, Dublin</p>
+                            <p class="text-muted mb-0">Co. Dublin</p>
+                        </div>
                     </div>
 
-                    <div class="mb-4">
-                        <h3 class="h6">Business Hours</h3>
-                        <p class="text-muted mb-0">Mon - Fri: 9:00 AM - 6:00 PM</p>
-                        <p class="text-muted">Saturday: 10:00 AM - 4:00 PM</p>
+                    <div class="location-detail">
+                        <div class="location-detail__icon"><i class="bi bi-telephone-fill"></i></div>
+                        <div>
+                            <span class="location-detail__label">Phone</span>
+                            <p class="location-detail__text">+353 1 234 5678</p>
+                        </div>
+                    </div>
+
+                    <div class="location-detail">
+                        <div class="location-detail__icon"><i class="bi bi-clock-fill"></i></div>
+                        <div>
+                            <span class="location-detail__label">Business Hours</span>
+                            <p class="location-detail__text mb-1">Mon - Fri</p>
+                            <p class="location-hours mb-0">9:00 AM - 6:00 PM</p>
+                            <p class="location-detail__text mb-1 mt-2">Saturday</p>
+                            <p class="location-hours mb-0">10:00 AM - 4:00 PM</p>
+                        </div>
                     </div>
 
                     <a href="https://www.google.com/maps/dir//Dublin+City+Centre"
                        target="_blank"
-                       class="btn btn-success w-100">
-                        Get Directions
+                       class="btn directions-btn w-100 mt-4">
+                        <i class="bi bi-compass me-2"></i>Get Directions
                     </a>
                 </div>
             </div>
@@ -136,7 +376,7 @@
 <footer class="footer-board text-center">
     <div class="container">
         <p class="mb-2">&copy; 2026 CarRentalServices. All rights reserved.</p>
-        <div class="d-flex justify-content-center align-items-center gap-3">
+        <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap">
             <span>Follow our journey:</span>
             <a href="https://www.instagram.com/yourhandle" target="_blank" class="social-link">Instagram</a>
         </div>
